@@ -1,6 +1,6 @@
 # NOAA-PMEL / SOCAT
 The Upload Dashboard for SOCAT.
-This repository was cloned from SurfaceOceanCarbonAtlas/socat repository and is the version used at NOAA/PMEL.
+This repository was cloned from the SurfaceOceanCarbonAtlas/Dashboard repository and is the version used at NOAA/PMEL.
 
 #### Legal Disclaimer
 *This repository is a software product and is not official communication
