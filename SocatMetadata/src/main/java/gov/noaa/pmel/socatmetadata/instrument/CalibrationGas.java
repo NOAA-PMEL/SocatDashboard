@@ -62,11 +62,19 @@ public class CalibrationGas implements Cloneable, Serializable {
         setSupplier(supplier);
         setUseFrequency(useFrequency);
         String strVal = (concStr != null) ? concStr.trim() : "";
-        if ( !strVal.isEmpty() )
-            setConcentration(new NumericString(strVal, GAS_CONCENTRATION_UNIT));
+        if ( !strVal.isEmpty() ) {
+            NumericString conc;
+            try {
+                conc = NumericString.guess(strVal, GAS_CONCENTRATION_UNIT);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                conc = new NumericString(null, strVal);
+            }
+            setConcentration(conc);// new NumericString(strVal, GAS_CONCENTRATION_UNIT));
+        }
         strVal = (accStr != null) ? accStr.trim() : "";
         if ( !strVal.isEmpty() )
-            setAccuracy(new NumericString(strVal, GAS_CONCENTRATION_UNIT));
+            setAccuracy(NumericString.guess(strVal, GAS_CONCENTRATION_UNIT));
     }
 
     /**

@@ -1,20 +1,150 @@
 package gov.noaa.pmel.socatmetadata.util;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Represents a numeric string value with units (optional).
  * Used when the numeric value of the string needs to be validated and used.
  */
+@SuppressWarnings("unchecked")
 public final class NumericString implements Cloneable, Serializable {
 
     private static final long serialVersionUID = -4326342003221951882L;
 
+//    private static final String DIGIT_PULLER_REGX_0 = "([+]?)([-]?\\d*\\.?\\d*)(.*)";
+    private static final String DIGIT_PULLER_REGX = "(\\D*?)([-]?\\d*\\.\\d*|\\d+).*";
+    private static int DIGIT_GROUP = 2;
+//    private static final String DIGIT_PULLER_REGX = "([+][/]?)?([-]?\\d*\\.?\\d*)(.*)";
+//    private static final String DIGIT_PULLER_REGX = "([+-]?(/-)?\\d*\\.?\\d*)(.*)";
+//    private static final String UNITS_PULLER_REGX = "[ \t\\(\\[\\{]+(\\)\\]\\}]+";
+    
+    static void test(String t) {
+        Pattern pattern = Pattern.compile(DIGIT_PULLER_REGX);
+        Matcher matcher = pattern.matcher(t);
+        boolean found = matcher.find();
+        boolean matches = matcher.matches();
+        System.out.println(t + " found: " + found + " matches: " + matches);
+    }
+    private static Pattern DIGIT_PULLER;
+//    private static Pattern UNITS_PULLER;
+    private static List<String> charList;
+    static {
+        DIGIT_PULLER = Pattern.compile(DIGIT_PULLER_REGX);
+//        UNITS_PULLER = Pattern.compile(UNITS_PULLER_REGX);
+        charList = (List<String>)new ArrayList() {{
+//            add(" ");
+//            add("\t");
+            add("{");
+            add("[");
+            add("(");
+            add("}");
+            add("]");
+            add(")");
+        }};
+    }
+    
     private String valueString;
     private String unitString;
     // numericValue is always assigned from parsing valueString
     private double numericValue;
 
+    public static NumericString guess(String fromString, String withUnits) throws IllegalArgumentException {
+        NumericString ns = guess(fromString);
+        String givenUnits = withUnits != null ? withUnits.trim().toLowerCase() : null;
+        if ( givenUnits != null ) {
+            String guessedUnits = ns.unitString.toLowerCase();
+            if ( ! guessedUnits.isEmpty()) {
+                if ( guessedUnits.indexOf(givenUnits) < 0 ) {
+                    throw new IllegalArgumentException("Specified Units of " + withUnits + 
+                                                       " are not compatible with units string " + guessedUnits + 
+                                                       " found in numeric string " + fromString);
+                }
+            }
+            ns.setUnitString(withUnits);
+        }
+        
+        return ns;
+    }
+    public static NumericString guess(String fromString) throws IllegalArgumentException {
+        NumericString ns = null;
+        if ( fromString == null || fromString.trim().isEmpty()) {
+            ns = new NumericString();
+        } else {
+//            try {
+                String val = pullDigits(fromString);
+                String units = null;
+                if ( val != null && ! val.trim().isEmpty()) {
+                    int endx = fromString.indexOf(val)+val.length();
+                    if ( endx < fromString.length()) {
+                        String unitsStr = fromString.substring(endx).trim();
+                        String[] parts = unitsStr.split("[\\(\\)\\[\\]\\{\\}]+");
+                        StringBuffer uBldr = new StringBuffer();
+                        int px = 0;
+                        while ( px < parts.length ) {
+                            if ( ! charList.contains(parts[px])) { 
+                                uBldr.append(parts[px]);
+                            }
+                            px += 1;
+                        }
+                        units = uBldr.toString();
+                    }
+                }
+                ns = new NumericString(val, units);
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
+        }
+        return ns;
+    }
+    
+    /**
+     * 
+     * @param valueStr
+     * @return
+     * @throws IllegalArgumentException
+     */
+    private static String pullDigits(String valueStr) throws IllegalArgumentException {
+        String numStr = null;
+        if ( valueStr == null || valueStr.isEmpty()) {
+            return null;
+        }
+        String checkStr = valueStr.trim();
+        
+        if ( checkStr.startsWith("+/-") ||
+             checkStr.startsWith("+-") ||
+             checkStr.startsWith("±")) {
+            int idx = checkStr.indexOf('-') > 0 ? checkStr.indexOf('-') : 0;
+            checkStr = checkStr.substring(idx+1).trim();
+        }
+//        System.out.println(valueStr +" : " + checkStr);
+        Matcher m = DIGIT_PULLER.matcher(checkStr); 
+        if ( m.matches()) {
+//            for (int i = 1; i <= m.groupCount(); i++) {
+//                System.out.println("  [" + i + "]:" + m.group(i));
+//            }
+            numStr = m.group(DIGIT_GROUP);
+//            if ( m.group(NEGATIVE_GROUP) != null ) {
+//                numStr = "-"+numStr;
+//            }
+            if ( !isValidNumber(numStr)) {
+                guessError(valueStr, numStr);
+            }
+        } else {
+            guessError(valueStr, numStr);
+        }
+        return numStr;
+    }
+    
+    private static void guessError(String valueStr, String numStr) throws IllegalArgumentException {
+        String msg = "WARNING: NumericString: Error pulling digits from value string \"" + valueStr +"\". Found: " + numStr;
+        System.err.println(msg);
+        throw new IllegalArgumentException(msg);
+    }
+    
     /**
      * Create with empty strings, and NaN as the associated numeric value
      */
@@ -36,7 +166,90 @@ public final class NumericString implements Cloneable, Serializable {
      */
     public NumericString(String value, String unit) throws IllegalArgumentException {
         setValueString(value);
+//        setValueString(pullDigits(value));
         setUnitString(unit);
+    }
+    
+    private static boolean isValidNumber(String numStr) {
+        try {
+            double d = Double.parseDouble(numStr);
+            return true;
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+    }
+    
+    public static void main(String[] args) {
+        String t = "286.42 ppm CO2";
+        test(t);
+        String s = "< 0.01";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "-123.34";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "123.45";
+        System.out.println(s+":"+guess(s));
+        s = "+123.45";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "123";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "- 123.34";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = ".42";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "-.42";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "286.42 ppm CO2";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "286.42ppm";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "286 ppm";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "+/-42.2ppm";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "+/- 42.2ppm";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "±42.2ppm";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "±42.2°C";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "± 42.2 °C";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "±42.2(°C)";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "±42.2 (°C)";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "±42.2 [µmol / mol]";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "±42.2 ({°C})";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "± 42.2 o/oo";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "< -0.01 ";
+//        System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
+        s = "± something °C";
+//      System.out.println(s + ": pulled: " + pullDigits(s));
+        System.out.println(s+":"+guess(s));
     }
 
     /**
@@ -98,6 +311,7 @@ public final class NumericString implements Cloneable, Serializable {
      * Does nothing; the numeric value is always assigned from parsing the string value.
      * This only exist to satisfy JavaBean requirements.
      */
+    @SuppressWarnings("unused")
     private void setNumericValue(double numericValue) {
     }
 

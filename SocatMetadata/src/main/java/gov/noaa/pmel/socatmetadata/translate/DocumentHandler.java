@@ -25,6 +25,7 @@ public abstract class DocumentHandler {
 
     private static final SimpleDateFormat DATE_NUMBER_PARSER = new SimpleDateFormat("yyyyMMdd");
     private static final SimpleDateFormat DATE_SLASH_PARSER = new SimpleDateFormat("yyyy/MM/dd");
+    private static final SimpleDateFormat MONTH_DAY_YEAR_PARSER = new SimpleDateFormat("MM/dd/yyyy");
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
 
     static {
@@ -193,7 +194,16 @@ public abstract class DocumentHandler {
                 // leave hypenstring as null
             }
         }
-        if ( null == hypenstring )
+        if ( null == hypenstring ) {
+            // maybe they are Americans...
+            // But maybe it HAS to be yyyy-MM-dd... see above
+            try {
+                hypenstring = DATE_FORMATTER.format(MONTH_DAY_YEAR_PARSER.parse(datestring));
+            } catch ( ParseException ex ) {
+                // leave hypenstring as null
+            }
+        }
+        if ( null == hypenstring ) // give up.
             return null;
 
         String[] pieces = hypenstring.split("-");
@@ -236,6 +246,13 @@ public abstract class DocumentHandler {
      * @return the numeric string object; never null but may be empty
      */
     public static NumericString getNumericString(String numVal, String unitVal) {
+            if ( unitVal == null ) {
+                try {
+                    return NumericString.guess(numVal);
+                } catch (IllegalArgumentException iex) {
+                    iex.printStackTrace();
+                }
+            }
         String numStr = numVal;
         String unitStr = unitVal;
         if ( numStr != null ) {

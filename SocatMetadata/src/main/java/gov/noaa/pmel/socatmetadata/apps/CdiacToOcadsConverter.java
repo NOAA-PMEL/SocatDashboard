@@ -60,8 +60,7 @@ public class CdiacToOcadsConverter {
         }
 
         SocatMetadata metadata = null;
-        try {
-            FileReader xmlReader = new FileReader(args[0]);
+        try ( FileReader xmlReader = new FileReader(args[0]); ) {
             CdiacReader cdiacReader = new CdiacReader(xmlReader);
             xmlReader.close();
             for (Map.Entry<String,VarType> entry : addnMap.entrySet()) {

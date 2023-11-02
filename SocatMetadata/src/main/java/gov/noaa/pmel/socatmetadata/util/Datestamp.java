@@ -31,6 +31,21 @@ public final class Datestamp implements Cloneable, Serializable {
     private Integer day;
 
     /**
+     * Create a Datestamp from a java.util.Date object in UTC.
+     * 
+     * @param date
+     * @return
+     */
+    public static Datestamp fromUTC(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setLenient(false);
+        String[] parts = sdf.format(date).split("-");
+        Datestamp ds = new Datestamp(parts[0], parts[1], parts[2]);
+        return ds;
+    }
+    
+    /**
      * Create with invalid values ({@link #INVALID}) for year, month, and day.
      */
     public Datestamp() {

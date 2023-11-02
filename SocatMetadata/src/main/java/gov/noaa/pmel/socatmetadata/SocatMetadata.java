@@ -58,12 +58,12 @@ public class SocatMetadata implements Cloneable, Serializable {
         }
         for (int k = 0; k < instruments.size(); k++) {
             for (String name : instruments.get(k).invalidFieldNames()) {
-                invalid.add("instruments[" + k + "]." + name);
+                invalid.add("instruments[" + k+":"+instruments.get(k).getName() + "]." + name);
             }
         }
         for (int k = 0; k < variables.size(); k++) {
             for (String name : variables.get(k).invalidFieldNames()) {
-                invalid.add("variables[" + k + "]." + name);
+                invalid.add("variables[" + k+":"+variables.get(k).getColName() + "]." + name);
             }
         }
         for (String name : miscInfo.invalidFieldNames()) {

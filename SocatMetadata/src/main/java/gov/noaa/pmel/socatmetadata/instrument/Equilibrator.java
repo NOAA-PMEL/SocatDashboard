@@ -36,10 +36,14 @@ public class Equilibrator extends Sampler implements Cloneable, Serializable {
         HashSet<String> invalids = super.invalidFieldNames();
         if ( equilibratorType.isEmpty() )
             invalids.add("equilibratorType");
-        if ( chamberWaterVol.isEmpty() )
-            invalids.add("chamberWaterVol");
-        if ( chamberGasVol.isEmpty() )
-            invalids.add("chamberGasVol");
+        // XXX This reference to "this" is because for some reason, 
+        // the isEmpty() test was returning true when the string was not empty!!!
+        if ( this.chamberVol.isEmpty()) { 
+            if ( chamberWaterVol.isEmpty() )
+                invalids.add("chamberWaterVol");
+            if ( chamberGasVol.isEmpty() )
+                invalids.add("chamberGasVol");
+        }
         if ( waterFlowRate.isEmpty() )
             invalids.add("waterFlowRate");
         if ( gasFlowRate.isEmpty() )

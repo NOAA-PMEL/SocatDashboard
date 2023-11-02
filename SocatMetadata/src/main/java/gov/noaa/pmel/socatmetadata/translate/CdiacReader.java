@@ -95,6 +95,7 @@ public class CdiacReader extends DocumentHandler {
     private static final String EXPERIMENT_NAME_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Experiment_Name";
     private static final String EXPERIMENT_TYPE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Experiment_Type";
     private static final String PLATFORM_TYPE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Platform_Type";
+    private static final String CO2_INSTRUMENT_TYPE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Co2_Instrument_type";
     private static final String MOORING_ID_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Mooring_ID";
 
     private static final String CRUISE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Cruise";
@@ -405,6 +406,9 @@ public class CdiacReader extends DocumentHandler {
         text = getElementText(null, EXPERIMENT_TYPE_ELEMENT_NAME);
         if ( !text.isEmpty() )
             addnInfo.add(0, "Experiment Type: " + text);
+        text = getElementText(null, CO2_INSTRUMENT_TYPE_ELEMENT_NAME);
+        if ( !text.isEmpty() )
+            addnInfo.add(0, "CO2 Instrument Type: " + text);
         info.setAddnInfo(addnInfo);
 
         return info;
@@ -451,9 +455,14 @@ public class CdiacReader extends DocumentHandler {
      */
     private Platform getPlatform(String datasetId) {
         Platform platform = new Platform();
-        platform.setPlatformId(getElementText(null, VESSEL_ID_ELEMENT_NAME));
+        String id = getElementText(null, VESSEL_ID_ELEMENT_NAME);
+        platform.setPlatformId(id);
         String name = getElementText(null, VESSEL_NAME_ELEMENT_NAME);
-        platform.setPlatformName(name);
+        if ( ! name.isEmpty()) {
+            platform.setPlatformName(name);
+        } else {
+            platform.setPlatformName(id);
+        }
         PlatformType type = PlatformType.parse(getElementText(null, PLATFORM_TYPE_ELEMENT_NAME));
         if ( PlatformType.UNKNOWN.equals(type) )
             type = guessPlatformType(name, datasetId);
@@ -1879,6 +1888,8 @@ public class CdiacReader extends DocumentHandler {
         DEFAULT_KEY_TO_TYPE_MAP.put("barometricpressurehpa", VarType.SEA_LEVEL_PRESSURE);
         DEFAULT_KEY_TO_TYPE_MAP.put("barometricpressurembar", VarType.SEA_LEVEL_PRESSURE);
         DEFAULT_KEY_TO_TYPE_MAP.put("bpratm", VarType.SEA_LEVEL_PRESSURE);
+        DEFAULT_KEY_TO_TYPE_MAP.put("licoratmpressure", VarType.SEA_LEVEL_PRESSURE);
+        DEFAULT_KEY_TO_TYPE_MAP.put("licoratmpressurehpa", VarType.SEA_LEVEL_PRESSURE);
         DEFAULT_KEY_TO_TYPE_MAP.put("pair", VarType.SEA_LEVEL_PRESSURE);
         DEFAULT_KEY_TO_TYPE_MAP.put("pairhpa", VarType.SEA_LEVEL_PRESSURE);
         DEFAULT_KEY_TO_TYPE_MAP.put("pairkpa", VarType.SEA_LEVEL_PRESSURE);
@@ -1959,8 +1970,6 @@ public class CdiacReader extends DocumentHandler {
         DEFAULT_KEY_TO_TYPE_MAP.put("equpress", VarType.EQUILIBRATOR_PRESSURE);
         DEFAULT_KEY_TO_TYPE_MAP.put("equpresssw", VarType.EQUILIBRATOR_PRESSURE);
         DEFAULT_KEY_TO_TYPE_MAP.put("equpressure", VarType.EQUILIBRATOR_PRESSURE);
-        DEFAULT_KEY_TO_TYPE_MAP.put("licoratmpressure", VarType.EQUILIBRATOR_PRESSURE);
-        DEFAULT_KEY_TO_TYPE_MAP.put("licoratmpressurehpa", VarType.EQUILIBRATOR_PRESSURE);
         DEFAULT_KEY_TO_TYPE_MAP.put("peq", VarType.EQUILIBRATOR_PRESSURE);
         DEFAULT_KEY_TO_TYPE_MAP.put("peqhpa", VarType.EQUILIBRATOR_PRESSURE);
         DEFAULT_KEY_TO_TYPE_MAP.put("peqkpa", VarType.EQUILIBRATOR_PRESSURE);

@@ -176,7 +176,7 @@ public class OcadsWriter extends DocumentHandler {
     private static final String STANDARD_GAS_UNCERTAINTY_ELEMENT_NAME = STANDARD_GAS_ELEMENT_NAME + SEP + "uncertainty";
 
     private Writer xmlWriter;
-
+    private boolean addVariableClassName;
     /**
      * Creates a new document containing only the root element for OCADS XML content.
      * Also assigns the writer to be used for output of the final XML document.
@@ -187,6 +187,21 @@ public class OcadsWriter extends DocumentHandler {
     public OcadsWriter(Writer writer) {
         rootElement = new Element("metadata");
         xmlWriter = writer;
+    }
+
+    /**
+     * Creates a new document containing only the root element for OCADS XML content.
+     * Also assigns the writer to be used for output of the final XML document.
+     *
+     * @param writer
+     *          write OCADS XML to this writer
+     * @param addVariableClassName 
+     *          Include the SocatMetadata variable type class name as type_name attribute 
+     *          to ocads xml variable element.
+     */
+    public OcadsWriter(Writer writer, boolean addVariableClassName) {
+        this(writer);
+        this.addVariableClassName = addVariableClassName;
     }
 
     /**
@@ -391,6 +406,9 @@ public class OcadsWriter extends DocumentHandler {
      *         use the information given in this variable
      */
     private void addVariableFields(Element ancestor, Variable var) {
+        if ( addVariableClassName ) {
+            ancestor.setAttribute("variable_type", var.getClass().getName());
+        }
         setElementText(ancestor, VARIABLE_COLUMN_NAME_ELEMENT_NAME, var.getColName());
         setElementText(ancestor, VARIABLE_FULL_NAME_ELEMENT_NAME, var.getFullName());
         setElementText(ancestor, VARIABLE_UNIT_ELEMENT_NAME, var.getVarUnit());
