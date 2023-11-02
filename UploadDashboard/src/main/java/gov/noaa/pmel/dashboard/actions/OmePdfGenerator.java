@@ -27,7 +27,7 @@ import java.io.IOException;
  *
  * @author Karl Smith
  */
-public class OmePdfGenerator {
+public class OmePdfGenerator implements PdfGenerator {
 
     private MetadataFileHandler metadataHandler;
     private DataFileHandler cruiseHandler;
@@ -79,6 +79,10 @@ public class OmePdfGenerator {
         }
     }
 
+    @Override
+    public void createPdf(String expocode) throws IllegalArgumentException, IOException {
+        createPiOmePdf(expocode);
+    }
     /**
      * Convert the PI-provided OME XML file for the given dataset to a human-friendly PDF file.
      *

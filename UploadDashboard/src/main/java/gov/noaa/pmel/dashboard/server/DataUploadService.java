@@ -249,15 +249,10 @@ public class DataUploadService extends HttpServlet {
             // Create a DashboardDatasetData from the contents of the uploaded data file
             DashboardDatasetData dsetData;
             String filename = item.getName();
-            try {
-                InputStreamReader reader = new InputStreamReader(item.getInputStream(), encoding);
-                try {
-                    dsetData = datasetHandler.assignDatasetDataFromInput(null, reader, dataFormat, username, 0, -1);
-                    dsetData.setUploadFilename(filename);
-                    dsetData.setUploadTimestamp(timestamp);
-                } finally {
-                    reader.close();
-                }
+            try ( InputStreamReader reader = new InputStreamReader(item.getInputStream(), encoding); ) {
+                dsetData = datasetHandler.assignDatasetDataFromInput(null, reader, dataFormat, username, 0, -1);
+                dsetData.setUploadFilename(filename);
+                dsetData.setUploadTimestamp(timestamp);
             } catch ( Exception ex ) {
                 // Mark as a failed file, and go on to the next
                 messages.add(DashboardUtils.INVALID_FILE_HEADER_TAG + " " + filename);

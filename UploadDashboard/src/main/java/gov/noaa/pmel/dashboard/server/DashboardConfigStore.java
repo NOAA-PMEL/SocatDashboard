@@ -5,7 +5,9 @@ package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.actions.DatasetChecker;
 import gov.noaa.pmel.dashboard.actions.DatasetSubmitter;
+import gov.noaa.pmel.dashboard.actions.OadsPdfGenerator;
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
+import gov.noaa.pmel.dashboard.actions.PdfGenerator;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
@@ -131,6 +133,7 @@ public class DashboardConfigStore {
     private PreviewPlotsHandler plotsHandler;
     private DatasetSubmitter datasetSubmitter;
     private OmePdfGenerator omePdfGenerator;
+    private OadsPdfGenerator oadsPdfGenerator;
     private KnownDataTypes knownUserDataTypes;
     private KnownDataTypes knownMetadataTypes;
     private KnownDataTypes knownDataFileTypes;
@@ -542,6 +545,7 @@ public class DashboardConfigStore {
 
         // OME XML to PDF generator
         omePdfGenerator = new OmePdfGenerator(appConfigDir, metadataFileHandler, dataFileHandler);
+        oadsPdfGenerator = new OadsPdfGenerator(appConfigDir, metadataFileHandler, dataFileHandler);
 
         // Dataset submitter - uses various handlers just created
         datasetSubmitter = new DatasetSubmitter(this);
@@ -882,6 +886,19 @@ public class DashboardConfigStore {
      */
     public ArchiveFilesBundler getArchiveFilesBundler() {
         return archiveFilesBundler;
+    }
+
+    public PdfGenerator getPdfGenerator(boolean isOme) {
+        return isOme ? 
+                getOmePdfGenerator() :
+                getOadsPdfGenerator();
+    }
+    
+    /**
+     * @return the OME XML to PDF generator
+     */
+    public OadsPdfGenerator getOadsPdfGenerator() {
+        return oadsPdfGenerator;
     }
 
     /**

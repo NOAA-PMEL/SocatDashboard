@@ -94,6 +94,10 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     // PopupPanel for displaying messages
     private DashboardInfoPopup msgPopup;
 
+    static native void logToConsole(String msg) /*-{
+        console.log(msg);
+    }-*/;
+
     /**
      * Create the manager for the UploadDashboard pages. Do not use this constructor; instead use the static methods
      * provided to display pages and messages.

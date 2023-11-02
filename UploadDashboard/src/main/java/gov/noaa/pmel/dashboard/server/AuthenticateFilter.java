@@ -19,6 +19,7 @@ public class AuthenticateFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+        System.out.println("AuthenticateFilter init");
     }
 
     @Override
@@ -26,6 +27,7 @@ public class AuthenticateFilter implements Filter {
             FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
+        System.out.println("Authenticate " + request);
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         HttpSession session = request.getSession(false);

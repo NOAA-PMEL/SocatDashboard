@@ -39,7 +39,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         DATE_STAMPER.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    private OmeMetadataInterface omeMData;
+    public /* XXX */ OmeMetadataInterface omeMData;
 
     /**
      * Create from the contents of the OME metadata file specified.

@@ -32,6 +32,8 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
 
     private static final SimpleDateFormat TIME_PARSER;
     private static final SimpleDateFormat DATE_STAMPER;
+    
+    private static final String CDIAC_OME_PDF_XSLT = "omefo.xsl";
 
     static {
         TimeZone utc = TimeZone.getTimeZone("UTC");
@@ -398,7 +400,8 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
         if ( (dateString == null) || dateString.isEmpty() || OmeMetadata.CONFLICT_STRING.equals(dateString) )
             return null;
         try {
-            Date endTime = TIME_PARSER.parse(dateString + " 23:59:59");
+            // ??? This was breaking junit (or other equals) comparisons to other implementations.
+            Date endTime = TIME_PARSER.parse(dateString + " 00:00:00");// + " 23:59:59");
             return endTime.getTime() / 1000.0;
         } catch ( Exception ex ) {
             return null;
@@ -434,11 +437,23 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
             FileReader xmlReader = new FileReader(cdiacOmeFile);
             sdiMData = OmeUtils.createSdiMetadataFromCdiacOme(
                     xmlReader, dataset.getUserColNames(), dataset.getDataColTypes());
+//            String cdiac_socat = String.valueOf(sdiMData);
+////            System.out.println("CDIAC socat string: "+ sdiMData);
+//            File xmlFile = new File(dataset.getDatasetId()+"_cdiac.xml");
+//            SdiOmeMetadata.writeXml(xmlFile, sdiMData);
+//            System.out.println("Wrote XML to " + xmlFile.getAbsolutePath());
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems interpreting the CDIAC OME XML: " + ex.getMessage(), ex);
         }
 
-        return OmeUtils.suggestDatasetQCFlag(sdiMData, dataset);
+        DatasetQCStatus status = OmeUtils.suggestDatasetQCFlag(sdiMData, dataset);
+        System.out.println(dataset.getDatasetId() + " : OME status: " + status);
+        return status;
+    }
+
+    @Override
+    public String getOmePdfXsltFileName() {
+        return CDIAC_OME_PDF_XSLT;
     }
 
 }

@@ -13,6 +13,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -20,6 +21,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -40,12 +42,12 @@ public class OmeManagerPage extends CompositeWithUsername {
     private static final String CANCEL_TEXT = "Cancel";
 
     private static final String CRUISE_HTML_INTRO_PROLOGUE = "<p>" +
-            "At this time, the system only uploads CDIAC-style OME XML metadata files. " +
-            "Unfortunately, the CDIAC Online Metadata Editor no longer exists. " +
-            "A new Online Metadata Editor is being built and tested, but is not available at this time. " +
+            "At this time, the system can upload CDIAC-style OME \"&lt;x_tags&gt;\" XML and OADS \"&lt;oads_metadata&gt;\"XML metadata files. " +
+            "A new Online Metadata Editor is available at: " +
+            "<a href='https://data.pmel.noaa.gov/sdig/socat/MetadataEditor.html' target='_blank'>https://data.pmel.noaa.gov/sdig/socat/MetadataEditor.html</a>" +
             "</p>" +
             "<p>" +
-            "Please upload whatever metadata files you have as \"Supplemental Documents\". " +
+            "Please upload whatever other metadata files you have as \"Supplemental Documents\". " +
             "A spreadsheet for providing metadata can be obtained using the \"metadata template\" " +
             "link on the SOCAT info page at <a href=\"https://www.socat.info/index.php/data-upload-and-quality-control/\" " +
             "target=\"_blank\">https://www.socat.info/index.php/data-upload-and-quality-control/</a> " +
@@ -56,6 +58,8 @@ public class OmeManagerPage extends CompositeWithUsername {
 
     private static final String NO_FILE_ERROR_MSG =
             "Please select an SOCAT OME XML metadata file to upload";
+    private static final String NO_SCHEMA_SELECTED =
+            "Please select the XML document schema.";
 
     private static final String OVERWRITE_WARNING_MSG =
             "The SOCAT OME XML metadata for this dataset will be overwritten.  Do you wish to proceed?";
@@ -90,11 +94,21 @@ public class OmeManagerPage extends CompositeWithUsername {
     @UiField
     FileUpload omeUpload;
     @UiField
+    CaptionPanel settingsCaption;
+    @UiField
+    RadioButton omeRadio;
+//    @UiField
+//    RadioButton cdiacRadio;
+    @UiField
+    RadioButton oadsRadio;
+    @UiField
     Hidden timestampToken;
     @UiField
     Hidden datasetIdsToken;
     @UiField
     Hidden omeToken;
+    @UiField
+    Hidden xmlToken;
     @UiField
     Button uploadButton;
     @UiField
@@ -185,6 +199,10 @@ public class OmeManagerPage extends CompositeWithUsername {
         timestampToken.setValue("");
         datasetIdsToken.setValue("");
         omeToken.setValue("");
+        xmlToken.setValue("");
+        omeRadio.setValue(false);
+        oadsRadio.setValue(false);
+//        cdiacRadio.setValue(false);
     }
 
     /**
@@ -195,6 +213,27 @@ public class OmeManagerPage extends CompositeWithUsername {
         timestampToken.setValue(localTimestamp);
         datasetIdsToken.setValue("[ \"" + cruise.getDatasetId() + "\" ]");
         omeToken.setValue("true");
+        xmlToken.setValue(getXmlSchema());
+    }
+
+    /**
+     * @return
+     */
+    private String getXmlSchema() {
+        if (omeRadio.getValue()) {
+            return omeRadio.getFormValue();
+        }
+        if (oadsRadio.getValue()) {
+            return oadsRadio.getFormValue();
+        }
+//        if (cdiacRadio.getValue()) {
+//            return cdiacRadio.getFormValue();
+//        }
+        return null;
+    }
+    
+    private boolean xmlSchemaSelected() {
+        return getXmlSchema() != null;
     }
 
     @UiHandler("logoutButton")
@@ -214,6 +253,10 @@ public class OmeManagerPage extends CompositeWithUsername {
         String uploadFilename = DashboardUtils.baseName(omeUpload.getFilename());
         if ( uploadFilename.isEmpty() ) {
             UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
+            return;
+        }
+        if ( !xmlSchemaSelected()) {
+            UploadDashboard.showMessage(NO_SCHEMA_SELECTED);
             return;
         }
 

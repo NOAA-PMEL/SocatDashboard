@@ -19,8 +19,19 @@
                     <g:Hidden name="timestamp" ui:field="timestampToken"/>
                     <g:Hidden name="datasetids" ui:field="datasetIdsToken"/>
                     <g:Hidden name="ometoken" ui:field="omeToken"/>
+                    <g:Hidden name="xmltoken" ui:field="xmlToken"/>
                 </g:FlowPanel>
             </g:FormPanel>
+            <g:CaptionPanel addStyleNames="{style.settingscaptionpanel}" ui:field="settingsCaption" captionText="XML scheme">
+                    <g:FlowPanel addStyleNames="{style.settingsradiopanel}">
+                        <g:RadioButton addStyleNames="{style.settingsradiobutton}"
+                                       name="xmlSchemeRadioGroup" ui:field="omeRadio" text="CDIAC / OME XML &lt;x_tags&gt;" formValue="OME"/>
+<!--                         <g:RadioButton addStyleNames="{style.settingsradiobutton}"
+                                       name="xmlSchemeRadioGroup" ui:field="cdiacRadio" text="Cdiac XML &lt;metadata&gt;" formValue="CDIAC"/>  -->
+                        <g:RadioButton addStyleNames="{style.settingsradiobutton}"
+                                       name="xmlSchemeRadioGroup" ui:field="oadsRadio" text="OADS XML &lt;oads_metadata&gt;" formValue="OADS"/>
+                    </g:FlowPanel>
+            </g:CaptionPanel>
             <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
                 <g:Button addStyleNames="{style.horizontalbutton}" ui:field="uploadButton"/>
                 <g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton"/>

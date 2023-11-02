@@ -64,8 +64,10 @@ public class VersionedFileHandler {
         }
         else {
             // Version-controlled directory
-            if ( !SVNWCUtil.isVersionedDirectory(filesDir) )
-                throw new IllegalArgumentException(filesDirName + " is not under version control");
+            if ( !SVNWCUtil.isVersionedDirectory(filesDir) ) {
+//                throw new IllegalArgumentException(filesDirName + " is not under version control");
+                System.err.println("******* WARNING *******: " + filesDirName + " is not under version control");
+            }
             // Create the version control manager with the provided credentials
             svnManager = SVNClientManager.newInstance(
                     SVNWCUtil.createDefaultOptions(true), svnUsername, svnPassword);

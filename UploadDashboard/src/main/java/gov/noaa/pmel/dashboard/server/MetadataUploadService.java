@@ -1,6 +1,7 @@
 package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
+import gov.noaa.pmel.dashboard.actions.PdfGenerator;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
@@ -79,6 +80,7 @@ public class MetadataUploadService extends HttpServlet {
         String datasetIds = null;
         String uploadTimestamp = null;
         String omeIndicator = null;
+        String xmlIndicator = null;
         FileItem metadataItem = null;
         try {
             Map<String,List<FileItem>> paramMap = metadataUpload.parseParameterMap(request);
@@ -98,6 +100,11 @@ public class MetadataUploadService extends HttpServlet {
                 itemList = paramMap.get("ometoken");
                 if ( (itemList != null) && (itemList.size() == 1) ) {
                     omeIndicator = itemList.get(0).getString();
+                }
+
+                itemList = paramMap.get("xmltoken");
+                if ( (itemList != null) && (itemList.size() == 1) ) {
+                    xmlIndicator = itemList.get(0).getString();
                 }
 
                 itemList = paramMap.get("metadataupload");
@@ -145,11 +152,12 @@ public class MetadataUploadService extends HttpServlet {
         }
 
         boolean isOme = omeIndicator.equals("true");
+        boolean isOmeXml = xmlIndicator.equals("OME");
         String version = configStore.getUploadVersion();
 
         MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
         DataFileHandler dataFileHandler = configStore.getDataFileHandler();
-        OmePdfGenerator omePdfGenerator = configStore.getOmePdfGenerator();
+        PdfGenerator omePdfGenerator = configStore.getPdfGenerator(isOmeXml);
         DatabaseRequestHandler databaseHandler = configStore.getDatabaseRequestHandler();
         DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
@@ -189,7 +197,7 @@ public class MetadataUploadService extends HttpServlet {
                 DashboardDataset dataset;
                 if ( isOme ) {
                     try {
-                        dataset = processOmeMetadata(id, metadata, metadataHandler, dataFileHandler, omePdfGenerator);
+                        dataset = processXmlMetadata(id, metadata, metadataHandler, dataFileHandler, omePdfGenerator);
                     } catch ( IllegalArgumentException ex ) {
                         // Problem with this PI_OME metadata - delete it
                         try {
@@ -211,7 +219,7 @@ public class MetadataUploadService extends HttpServlet {
                     Date now = new Date();
                     String comment;
                     if ( isOme )
-                        comment = "Update of OME metadata.  ";
+                        comment = "Update of " + xmlIndicator + " XML metadata.  ";
                     else
                         comment = "Update of metadata file \"" + uploadFilename + "\".  ";
                     comment += "Data and WOCE flags were not changed.";
@@ -285,7 +293,7 @@ public class MetadataUploadService extends HttpServlet {
      *         metadata file handler to obtain the OME metadata from the metadata information
      * @param dataFileHandler
      *         data file handler to obtain the data file information
-     * @param omePdfGenerator
+     * @param pdfGenerator
      *         handler to generate the PDF from the OME metadata
      *
      * @return the updated dataset information after adding this OME metadata
@@ -293,9 +301,9 @@ public class MetadataUploadService extends HttpServlet {
      * @throws IllegalArgumentException
      *         if the OME metadata is invalid, or if there is a problem generating the PDF from the OME metadata
      */
-    public static DashboardDataset processOmeMetadata(String id, DashboardMetadata metadata,
+    public static DashboardDataset processXmlMetadata(String id, DashboardMetadata metadata,
             MetadataFileHandler metadataHandler, DataFileHandler dataFileHandler,
-            OmePdfGenerator omePdfGenerator) throws IllegalArgumentException {
+            PdfGenerator pdfGenerator) throws IllegalArgumentException {
 
         // Make sure the contents are valid OME XML
         DashboardOmeMetadata omedata;
@@ -306,15 +314,18 @@ public class MetadataUploadService extends HttpServlet {
         }
         // Generate the PDF from this PI_OME.xml file; this adds the PDF file as a "supplemental document"
         try {
-            omePdfGenerator.createPiOmePdf(id);
+            pdfGenerator.createPdf(id);
         } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " + ex.getMessage());
+            System.err.println("Failed to create PDF from uploaded XML: " + ex.getMessage()); // XXX TODO: better notification
+            ex.printStackTrace();
+//            throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " + ex.getMessage());
         }
         // "Add" this OME metadata file by assigning the OME timestamp, and get the dataset information
         DashboardDataset dataset = dataFileHandler.addAddlDocTitleToDataset(id, omedata);
 
         try {
             DatasetQCStatus autoSuggestedQC = omedata.suggestedDatasetStatus(dataset);
+            System.out.println("AutoSuggest QC Flag for dataset " + dataset.getDatasetId() + ": " + autoSuggestedQC);
             DatasetQCStatus status = dataset.getSubmitStatus();
             if ( !autoSuggestedQC.getAutoSuggested().equals(status.getAutoSuggested()) ) {
                 status.setAutoSuggested(autoSuggestedQC.getAutoSuggested());
@@ -324,10 +335,12 @@ public class MetadataUploadService extends HttpServlet {
                         "Update of automation-suggested dataset QC flag");
             }
         } catch ( Exception ex ) {
+            ex.printStackTrace();
             /*
              * Either there is a problem with the metadata or the code to recommend
              * a dataset QC flag is faulty; whatever the reason, do not make a recommendation,
              * but keep this OME metadata (so squash this exception).
+             * BUT AT LEAST SAY SOMETHING ABOUT IT!!!
              */
         }
         return dataset;

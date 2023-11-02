@@ -10,6 +10,7 @@ import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.socatmetadata.SocatMetadata;
 import org.junit.Test;
 
+import java.io.FileReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -31,9 +32,11 @@ public class OmeUtilsTest {
         dset.setUserColNames(DATA_COLUMN_NAMES);
         dset.setDataColTypes(DATA_COLUMN_TYPES);
 
-        StringReader reader = new StringReader(AOML_CDIAC_XML_DATA_STRING);
+        String OME_FILE = "/Users/kamb/workspace/oa_dashboard_test_data/SOCAT/xtra/316420200911_PI_OME.xml";
+//        StringReader reader = new StringReader(AOML_CDIAC_XML_DATA_STRING);
+        
         SocatMetadata mdata = null;
-        try {
+        try ( FileReader reader = new FileReader(OME_FILE); ) {
             mdata = OmeUtils.createSdiMetadataFromCdiacOme(reader, dset.getUserColNames(), dset.getDataColTypes());
         } catch ( Exception ex ) {
             fail("Unable to create the SDIMetadata object from CDIAC OME XML: " + ex.getMessage());
@@ -70,6 +73,15 @@ public class OmeUtilsTest {
             "WOCE_QC_FLAG",
             "QC_SUBFLAG"
     ));
+    
+    public static void main(String[] args) {
+       try {
+        new OmeUtilsTest().testSuggestDatasetQCFlag();
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        // TODO: handle exception
+    }
+    }
 
     private static final DoubleDashDataType FCO2_ATM_WET_INTERP = new DoubleDashDataType("fCO2_atm_wet_interp",
             645.0, "fCO2_atm_wet_interp", "interpolated air fCO2 wet", false,

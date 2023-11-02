@@ -26,6 +26,8 @@ import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.TreeSet;
 
 /**
@@ -297,8 +299,59 @@ public class SubmitForQCPage extends CompositeWithUsername {
             if ( !archiveTimestamps.isEmpty() )
                 cdiacDate = archiveTimestamps.get(archiveTimestamps.size() - 1);
             if ( submitStatus.isPrivate() && cdiacDate.isEmpty() ) {
-                cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) +
-                        "</li>");
+                StringBuilder line = new StringBuilder("<li>");
+                line.append(SafeHtmlUtils.htmlEscape(expo))
+                    .append(CRUISE_INFO_PROLOGUE).append(QC_STATUS_INTRO)
+                    .append(submitStatus.statusString())
+                    .append(CRUISE_INFO_EPILOGUE);
+                if ( !submitStatus.getComments().isEmpty()) {
+                    List<String>comments = submitStatus.getComments();
+                    String br = "<br>";
+                    line.append(br).append("<div style='margin-left:1em'>");
+                    line.append("Comments:&nbsp;");
+                    Iterator<String> ci = comments.iterator();
+                    String firstLine = ci.next().trim();
+                    int startFrom = 0;
+                    if ( firstLine.startsWith("(")) {
+                        firstLine = firstLine.substring(1);
+                        int end = firstLine.indexOf(')');
+                        startFrom = end+1;
+                        if ( startFrom > 0 ) {
+                            String from = firstLine.substring(0,end);
+                            line.append(from);
+                            firstLine = firstLine.substring(startFrom);
+                        }
+                    }
+                    line.append(br);
+                    line.append("<div style='margin-left:2em'>");
+                    String[] splitLines = firstLine.split("\\.\\s+");
+                    for (String subline : splitLines) {
+                        int incdex = subline.indexOf("incomplete:");
+                        if ( incdex > 0) {
+                            startFrom = incdex+"incomplete:".length()+1;
+                            String header = subline.substring(0, startFrom);
+                            line.append(header).append("<br><div style='margin-left:3em'>");
+                            subline = subline.substring(startFrom);
+                            String[] sousLines = subline.split(";");
+                            for (String sous : sousLines) {
+                                sous = sous.trim();
+                                if ( sous.length() > 2 ) {
+                                    line.append(sous).append(br);
+                                }
+                            }
+                            line.append("</div>");
+                        } else {
+                            line.append(subline).append(br);
+                        }
+                    }
+                    while ( ci.hasNext()) { // XXX ??? Don't know if we need to do all of the above again.
+                        String brokenLine = ci.next().replaceAll("\\.\\s+",".<br>");
+                        line.append(brokenLine);
+                    }
+                    line.append("</div></div>");
+                }
+                line.append("</li>");
+                cruiseIntros.add(line.toString());
             }
             else if ( cdiacDate.isEmpty() ) {
                 cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) +

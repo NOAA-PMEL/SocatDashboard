@@ -5,6 +5,8 @@ package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.metadata.OadsOmeMetadata;
+import gov.noaa.pmel.dashboard.metadata.OmeMetadataInterface;
 import gov.noaa.pmel.dashboard.qc.DataLocation;
 import gov.noaa.pmel.dashboard.qc.DataQCEvent;
 import gov.noaa.pmel.dashboard.qc.RowNumSet;
@@ -13,6 +15,9 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -427,8 +432,11 @@ public class MetadataFileHandler extends VersionedFileHandler {
         try {
             FileOutputStream dest = new FileOutputStream(destFile);
             try {
-                byte[] buff = new byte[4096];
+                byte[] buff = new byte[4096*2];
                 int numRead = src.read(buff);
+                // XXX This was looking for the bad UTF-8 encoded character.
+//                String bStr = new  String(buff);
+//                System.out.println(bStr);
                 while ( numRead > 0 ) {
                     dest.write(buff, 0, numRead);
                     numRead = src.read(buff);
@@ -806,10 +814,36 @@ public class MetadataFileHandler extends VersionedFileHandler {
     public DashboardOmeMetadata getOmeFromFile(DashboardMetadata mdata)
             throws IllegalArgumentException {
         File mdataFile = getMetadataFile(mdata.getDatasetId(), mdata.getFilename());
-        DashboardOmeMetadata omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, mdataFile);
+        // XXX Will have to know if this is CDIAC/OME or OADS.  Perhaps we add that to DashboardMetadata?
+        
+        Class<? extends OmeMetadataInterface> mdataClass = getMetadataClass(mdataFile);
+        DashboardOmeMetadata omeMData = new DashboardOmeMetadata(mdataClass, mdata, mdataFile);
+//        DashboardOmeMetadata omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, mdataFile);
         return omeMData;
     }
 
+    public static Class<? extends OmeMetadataInterface> getMetadataClass(File mdataFile) {
+        Class<? extends OmeMetadataInterface> mdataClass = null;
+        Document mdataDoc;
+        try {
+            mdataDoc = (new SAXBuilder()).build(mdataFile);
+            Element root = mdataDoc.getRootElement();
+            String name = root.getName().toLowerCase();
+            switch (name) {
+                case "x_tags":
+                    mdataClass = CdiacOmeMetadata.class;
+                    break;
+                case "oads_metadata":
+                    mdataClass = OadsOmeMetadata.class;
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown metadata type: " + name);
+            }
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException(ex);
+        }
+        return mdataClass;
+    }
     /**
      * Create the WOCE flags messages file from the WOCE flags in the database.
      * This file is NOT added as a metadata document.

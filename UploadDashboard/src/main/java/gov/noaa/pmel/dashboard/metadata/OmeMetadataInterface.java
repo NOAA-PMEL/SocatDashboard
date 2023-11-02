@@ -45,6 +45,15 @@ public interface OmeMetadataInterface {
     void write(File mdataFile) throws IOException;
 
     /**
+     * Get the name of the XSLT file to do the transformation to generate OME PDF document.
+     * The XSLT file must be in the XSLT Resources Directory as specified in the
+     * DashboardConfigStore.
+     * 
+     * @return the name of the XSLT file 
+     */
+    String getOmePdfXsltFileName();
+    
+    /**
      * @return if the current contents this OME object are acceptable; in particular,
      *         all required fields have acceptable values and there are no conflicting field values.
      */

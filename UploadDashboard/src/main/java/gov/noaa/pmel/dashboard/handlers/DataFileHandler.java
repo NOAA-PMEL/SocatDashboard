@@ -294,8 +294,6 @@ public class DataFileHandler extends VersionedFileHandler {
 
         CSVFormat format = CSVFormat.EXCEL.withIgnoreSurroundingSpaces()
                                           .withDelimiter(spacer);
-        CSVParser dataParser = new CSVParser(dataReader, format);
-
         String expocode = null;
         ArrayList<String> preamble = new ArrayList<String>();
         ArrayList<String> columnNames = null;
@@ -303,7 +301,7 @@ public class DataFileHandler extends VersionedFileHandler {
         ArrayList<ArrayList<String>> dataVals = new ArrayList<ArrayList<String>>();
         ArrayList<Integer> rowNums = new ArrayList<Integer>();
         int dataRowNum = 0;
-        try {
+        try ( CSVParser dataParser = new CSVParser(dataReader, format); ) {
             boolean checkForUnits = false;
 
             for (CSVRecord record : dataParser) {
@@ -421,8 +419,6 @@ public class DataFileHandler extends VersionedFileHandler {
                     }
                 }
             }
-        } finally {
-            dataParser.close();
         }
 
         if ( numDataColumns < MIN_NUM_DATA_COLUMNS )

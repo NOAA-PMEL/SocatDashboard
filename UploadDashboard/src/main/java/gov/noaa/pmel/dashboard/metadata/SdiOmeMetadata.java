@@ -60,6 +60,11 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
         }
     }
 
+    public static void writeXml(File xmlFile, SocatMetadata metadata) throws IOException {
+        try ( XMLEncoder xenc = new XMLEncoder(new FileOutputStream(xmlFile)); ) {
+            xenc.writeObject(metadata);
+        }
+    }
     @Override
     public void write(File mdataFile) throws IOException {
         XMLEncoder xenc = new XMLEncoder(new FileOutputStream(mdataFile));
@@ -306,6 +311,11 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
     public DatasetQCStatus suggestedDatasetStatus(DashboardOmeMetadata metadata, DashboardDataset dataset)
             throws IllegalArgumentException {
         return OmeUtils.suggestDatasetQCFlag(mdata, dataset);
+    }
+
+    @Override
+    public String getOmePdfXsltFileName() {
+        throw new RuntimeException("Not implemented");
     }
 
 }

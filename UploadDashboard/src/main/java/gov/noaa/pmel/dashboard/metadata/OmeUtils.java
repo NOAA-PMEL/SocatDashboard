@@ -120,13 +120,17 @@ public class OmeUtils {
             "microatmospheres",
             "uatmospheres",
             SpellingHandler.mu + "atmospheres",
+            SpellingHandler.mu2 + "atmospheres",
             "uatm",
             SpellingHandler.mu + "atm",
+            SpellingHandler.mu2 + "atm",
             "micromole_per_mole",
             "umol_per_mol",
             SpellingHandler.mu + "mol_per_mol",
+            SpellingHandler.mu2 + "mol_per_mol",
             "umol/mol",
             SpellingHandler.mu + "mol/mol",
+            SpellingHandler.mu2 + "mol/mol",
             "ppm"
     );
 
@@ -193,7 +197,11 @@ public class OmeUtils {
      *         if there are problems with the given Metadata
      */
     public static DatasetQCStatus suggestDatasetQCFlag(SocatMetadata sdiMData,
-            DashboardDataset dataset) throws IllegalArgumentException {
+                                                        DashboardDataset dataset) throws IllegalArgumentException {
+        return suggestDatasetQCFlag(sdiMData);
+    }
+    public static DatasetQCStatus suggestDatasetQCFlag(SocatMetadata sdiMData) throws IllegalArgumentException {
+            //DashboardDataset dataset) throws IllegalArgumentException {
         HashMap<String,GasSensor> co2SensorsMap = new HashMap<String,GasSensor>();
         for (Instrument instrument : sdiMData.getInstruments()) {
             if ( instrument instanceof GasSensor ) {
@@ -294,31 +302,31 @@ public class OmeUtils {
             comment += ".  ";
             acceptable = false;
         }
-        else {
-            ArrayList<DataColumnType> colTypes = dataset.getDataColTypes();
-            ArrayList<String> colNames = dataset.getUserColNames();
-            for (int k = 0; k < colNames.size(); k++) {
-                // Some columns containing (repeated) metadata may have been added
-                // only for the dashboard - instead of adding it in the prologue.
-                // At this time, do not worry about these not being described as well as
-                // the "obvious" names/types, although ideally all columns should be described.
-                boolean obvious = false;
-                for (DataColumnType obvType : OBVIOUS_DATA_COLUMN_TYPES) {
-                    if ( obvType.typeNameEquals(colTypes.get(k)) ) {
-                        obvious = true;
-                        break;
-                    }
-                }
-                if ( !obvious ) {
-                    String name = colNames.get(k);
-                    if ( !varColNames.contains(name) ) {
-                        comment += "Metadata incomplete: data column '" + name + "' is not described in the metadata.  ";
-                        acceptable = false;
-                        break;
-                    }
-                }
-            }
-        }
+//        else {
+//            ArrayList<DataColumnType> colTypes = dataset.getDataColTypes();
+//            ArrayList<String> colNames = dataset.getUserColNames();
+//            for (int k = 0; k < colNames.size(); k++) {
+//                // Some columns containing (repeated) metadata may have been added
+//                // only for the dashboard - instead of adding it in the prologue.
+//                // At this time, do not worry about these not being described as well as
+//                // the "obvious" names/types, although ideally all columns should be described.
+//                boolean obvious = false;
+//                for (DataColumnType obvType : OBVIOUS_DATA_COLUMN_TYPES) {
+//                    if ( obvType.typeNameEquals(colTypes.get(k)) ) {
+//                        obvious = true;
+//                        break;
+//                    }
+//                }
+//                if ( !obvious ) {
+//                    String name = colNames.get(k);
+//                    if ( !varColNames.contains(name) ) {
+//                        comment += "Metadata incomplete: data column '" + name + "' is not described in the metadata.  ";
+//                        acceptable = false;
+//                        break;
+//                    }
+//                }
+//            }
+//        }
         if ( !acceptable ) {
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
         }
