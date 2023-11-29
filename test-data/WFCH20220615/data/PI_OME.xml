@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="/ocd/gcc/xml/xmlunderway2.xsl"?> 
+<x_tags>
+  <User>
+    <Name>Medley, Daryin</Name>
+    <Organization>NOAA/AOML</Organization>
+    <Address>4301 Rickenbacker Causeway, Miami, Fl 33149</Address>
+    <Phone>(305) 361-4375</Phone>
+    <Email>daryin.medley@noaa.gov</Email>
+  </User>
+  <Investigator>
+    <Name>Wanninkhof, Rik</Name>
+    <Organization>NOAA/Atlantic Oceanographic &amp; Meteorological Laboratory</Organization>
+    <Address>4301 Rickenbacker Causeway, Miami Fl, 33149</Address>
+    <Phone>305-361-4379</Phone>
+    <Email>Rik.Wanninkhof@noaa.gov</Email>
+  </Investigator>
+  <Investigator>
+    <Name>Pierrot, Denis</Name>
+    <Organization>NOAA/AOML CIMAS</Organization>
+    <Address>4301 Rickenbacker Causeway, Miami, Fl 33149</Address>
+    <Phone>(305) 361-4441</Phone>
+    <Email>Denis.Pierrot@noaa.gov</Email>
+  </Investigator>
+  <Dataset_Info>
+    <Dataset_ID>datasetID</Dataset_ID>
+    <Funding_Info>NOAA Climate Program Office; NOAA Ocean Acidification Program</Funding_Info>
+    <Submission_Dates>
+      <Initial_Submission>20230727 </Initial_Submission>
+      <Revised_Submission>20230727 </Revised_Submission>
+    </Submission_Dates>
+  </Dataset_Info>
+  <Cruise_Info>
+    <Experiment>
+      <Experiment_Name>Charcot_20220615</Experiment_Name>
+      <Experiment_Type>SOOP_Line</Experiment_Type>
+      <Platform_Type>Ship</Platform_Type>
+      <Co2_Instrument_type>Equilibrator-IR or CRDS or GC</Co2_Instrument_type>
+      <Cruise>
+        <Cruise_ID>WFCH20220615</Cruise_ID>
+        <Cruise_Info>AOML_SOOP_CO2</Cruise_Info>
+        <Geographical_Coverage>
+          <Bounds>
+            <Westernmost_Longitude>9.5</Westernmost_Longitude>
+            <Easternmost_Longitude>33.7</Easternmost_Longitude>
+            <Northernmost_Latitude>81.0</Northernmost_Latitude>
+            <Southernmost_Latitude>78.0</Southernmost_Latitude>
+          </Bounds>
+        </Geographical_Coverage>
+        <Temporal_Coverage>
+          <Start_Date>20220615</Start_Date>
+          <End_Date>20220623</End_Date>
+        </Temporal_Coverage>
+        <Ports_of_Call>Lonyearbyen, Norway</Ports_of_Call>
+      </Cruise>
+    </Experiment>
+    <Vessel>
+      <Vessel_Name>Le Commandant Charcot</Vessel_Name>
+      <Vessel_ID>WFCH</Vessel_ID>
+      <Vessel_Owner>Compagnie du Ponant</Vessel_Owner>
+    </Vessel>
+  </Cruise_Info>
+  <Variables_Info>
+    <Variable>
+      <Variable_Name>xCO2_EQU_ppm</Variable_Name>
+      <Description_of_Variable>Mole fraction of CO2 in the equilibrator headspace (dry) at equilibrator temperature (ppm)</Description_of_Variable>
+      <Unit_of_Variable>ppm</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>xCO2_ATM_ppm</Variable_Name>
+      <Description_of_Variable>Mole fraction of CO2 measured in dry outside air (ppm)</Description_of_Variable>
+      <Unit_of_Variable>ppm</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>xCO2_ATM_interpolated_ppm</Variable_Name>
+      <Description_of_Variable>Mole fraction of CO2 in outside air associated with each water analysis.  These values are interpolated between the bracketing averaged good xCO2_ATM analyses (ppm)</Description_of_Variable>
+      <Unit_of_Variable>ppm</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>PRES_EQU_hPa</Variable_Name>
+      <Description_of_Variable>Barometric pressure in the equilibrator headspace (hPa)</Description_of_Variable>
+      <Unit_of_Variable>hPa</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>PRES_ATM@SSP_hPa</Variable_Name>
+      <Description_of_Variable>Barometric pressure measured outside, corrected to sea level (hPa)</Description_of_Variable>
+      <Unit_of_Variable>hPa</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>TEMP_EQU_C</Variable_Name>
+      <Description_of_Variable>Water temperature in equilibrator (&#176;C)</Description_of_Variable>
+      <Unit_of_Variable>Degree C</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>SST_C</Variable_Name>
+      <Description_of_Variable>Sea surface temperature (&#176;C)</Description_of_Variable>
+      <Unit_of_Variable>Degree C</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>SAL_permil</Variable_Name>
+      <Description_of_Variable>Sea surface salinity on Practical Salinity Scale (o/oo)</Description_of_Variable>
+      <Unit_of_Variable>ppt</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>fCO2_SW@SST_uatm</Variable_Name>
+      <Description_of_Variable>Fugacity of CO2 in sea water at SST and 100% humidity (&#956;atm)</Description_of_Variable>
+      <Unit_of_Variable>&#956;atm</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>fCO2_ATM_interpolated_uatm</Variable_Name>
+      <Description_of_Variable>Fugacity of CO2 in air corresponding to the interpolated xCO2 at SST and 100% humidity (&#956;atm)</Description_of_Variable>
+      <Unit_of_Variable>&#956;atm</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>dfCO2_uatm</Variable_Name>
+      <Description_of_Variable>Sea water fCO2 minus interpolated air fCO2 (&#956;atm)</Description_of_Variable>
+      <Unit_of_Variable>&#956;atm</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>WOCE_QC_FLAG</Variable_Name>
+      <Description_of_Variable>Quality control flag for fCO2 values (2=good, 3=questionable)</Description_of_Variable>
+      <Unit_of_Variable>None</Unit_of_Variable>
+    </Variable>
+    <Variable>
+      <Variable_Name>QC_SUBFLAG</Variable_Name>
+      <Description_of_Variable>Quality control subflag for fCO2 values, provides explanation when QC flag=3</Description_of_Variable>
+      <Unit_of_Variable>None</Unit_of_Variable>
+    </Variable>
+  </Variables_Info>
+  <Method_Description>
+    <Equilibrator_Design>
+      <Depth_of_Sea_Water_Intake>9 meters</Depth_of_Sea_Water_Intake>
+      <Location_of_Sea_Water_Intake>Through the bottom of the hull, three decks below Wet Laboratory </Location_of_Sea_Water_Intake>
+      <Equilibrator_Type>Spray head above dynamic pool with thermal jacket</Equilibrator_Type>
+      <Equilibrator_Volume>0.95 L (0.4 L water, 0.55 L headspace)</Equilibrator_Volume>
+      <Water_Flow_Rate>2 - 3 L/min</Water_Flow_Rate>
+      <Headspace_Gas_Flow_Rate>70 - 150 ml/min</Headspace_Gas_Flow_Rate>
+      <Vented>Yes</Vented>
+      <Drying_Method_for_CO2_in_water>Gas stream passes through a thermoelectric condenser (~5 &#176;C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).</Drying_Method_for_CO2_in_water>
+      <Additional_Information>Primary equilibrator is vented through a secondary equilibrator.</Additional_Information>
+    </Equilibrator_Design>
+    <CO2_in_Marine_Air>
+      <Measurement>Yes, 5 readings in a group every 3.5 hours</Measurement>
+      <Location_and_Height>Inlet on radar mast, 34m above sea surface </Location_and_Height>
+      <Drying_Method>Gas stream passes through a thermoelectric condenser (~5 &#176;C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry). </Drying_Method>
+    </CO2_in_Marine_Air>
+    <CO2_Sensors>
+      <CO2_Sensor>
+        <Measurement_Method>IR</Measurement_Method>
+        <Manufacturer>LI-COR</Manufacturer>
+        <Model>6262</Model>
+        <Frequency>Every 140 seconds, except during calibration</Frequency>
+        <Resolution_Water>&#177; 0.01 &#956;atm in fCO2_SW</Resolution_Water>
+        <Uncertainty_Water>&#177; 2 &#956;atm in fCO2_SW</Uncertainty_Water>
+        <Resolution_Air>&#177; 0.01 &#956;atm in fCO2_ATM</Resolution_Air>
+        <Uncertainty_Air>&#177; 0.5 &#956;atm in fCO2_ATM</Uncertainty_Air>
+        <Manufacturer_of_Calibration_Gas>
+          Std 1: CB10923, 305.52 ppm, owned by ESRL, used every ~5.0 hours. 
+          Std 2: CC114995, 376.31 ppm, owned by ESRL, used every ~5.0 hours.
+          Std 3: CA04480, 420.54 ppm, owned by ESRL, used every ~5.0 hours. 
+          Std 4: CB11297, 504.52 ppm, owned by ESRL, used every ~5.0 hours. 
+          Std 5: LL100000, 0.00 ppm, owned by AOML, used every ~5.0 hours.  
+        </Manufacturer_of_Calibration_Gas>
+        <No_Of_Non_Zero_Gas_Stds>4</No_Of_Non_Zero_Gas_Stds>
+        <CO2_Sensor_Calibration>The analyzer is calibrated every 5 hours with field standards that in turn were calibrated with primary standards that are directly traceable to the WMO X2019 scale.  Standards on the X2007 scale will be specified if used.  The zero gas is ultra-high purity air.</CO2_Sensor_Calibration>
+        <Sensor_Calibration></Sensor_Calibration>
+        <Other_Comments>The instrument is located in the Wet Laboratory on the starboard side of Deck 3, ~4m above the water line.  The temperature in the space is regulated.  Ultra-High Purity air (0.0 ppm CO2) and the high standard gas are used to zero and span the LI-COR analyzer. </Other_Comments>
+        <Method_References>Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, T. Johannessen, A. Olsen, R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway pCO2 measuring systems and data reduction routines, Deep-Sea Res II, 56, 512-522.</Method_References>
+        <Details_Co2_Sensing>details of CO2 sensing (not required)</Details_Co2_Sensing>
+        <Measured_Co2_Params>xCO2(dry)</Measured_Co2_Params>
+      </CO2_Sensor>
+    </CO2_Sensors>
+    <Sea_Surface_Temperature>
+      <Location>In scientific sensor and pump room, before the SW pump and about 3m after the intake, which is directly through the ship's hull.</Location>
+      <Manufacturer>Seabird, Inc.</Manufacturer>
+      <Model>SBE 38</Model>
+      <Accuracy_degC>0.001</Accuracy_degC>
+      <Precision_degC>0.0003</Precision_degC>
+      <Calibration>Factory calibration</Calibration>
+      <Other_Comments>Manufacturer's Resolution is taken as Precision; Maintained by the ship.</Other_Comments>
+    </Sea_Surface_Temperature>
+    <Equilibrator_Temperature>
+      <Location>Inserted into equilibrator ~5 cm below water level</Location>
+      <Manufacturer>Hart</Manufacturer>
+      <Model>1523</Model>
+      <Accuracy_degC>0.015</Accuracy_degC>
+      <Precision_degC>0.0003</Precision_degC>
+      <Calibration>Factory calibration</Calibration>
+      <Other_Comments>Resolution is taken as Precision.</Other_Comments>
+    </Equilibrator_Temperature>
+    <Equilibrator_Pressure>
+      <Location>Attached to equilibrator headspace. Differential pressure reading from Setra 239 attached to the equilibrator headspace is added to the pressure reading from the internal LICOR pressure sensor.</Location>
+      <Manufacturer>LI-COR</Manufacturer>
+      <Model>6262-03</Model>
+      <Accuracy_hPa>1.15</Accuracy_hPa>
+      <Precision_hPa>0.002</Precision_hPa>
+      <Calibration>Factory calibration</Calibration>
+      <Other_Comments>Manufacturer's Resolution is taken as Precision.</Other_Comments>
+    </Equilibrator_Pressure>
+    <Atmospheric_Pressure>
+      <Location> Attached to EUCA Weather Station on deck 10, 26 m above sea level </Location>
+      <Manufacturer>Vaisala </Manufacturer>
+      <Model>PTB220 </Model>
+      <Accuracy> &#177; 0.15 hPa </Accuracy>
+      <Precision> 0.01 hPa </Precision>
+      <Calibration> Factory Calibration </Calibration>
+      <Normalized> no </Normalized>
+      <Other_Comments> Manufacturer's Resolution is taken as Precision; Maintained by ship. </Other_Comments>
+    </Atmospheric_Pressure>
+    <Sea_Surface_Salinity>
+      <Location>Near the pCO2 System in the Wet Laboratory </Location>
+      <Manufacturer>Seabird</Manufacturer>
+      <Model>SBE 45</Model>
+      <Accuracy>&#177; 0.005 o/oo</Accuracy>
+      <Precision>0.0002 o/oo</Precision>
+      <Calibration>Factory calibration</Calibration>
+      <Other_Comments>Manufacturer's Resolution is taken as Precision; Maintained by ship.</Other_Comments>
+    </Sea_Surface_Salinity>
+  </Method_Description>
+  <Data_set_References></Data_set_References>
+  <Additional_Information> The analytical system operated well during this cruise.  The seawater pump was not run while the ship was among ice.
+  The LICOR pressure sensor showed a drift from normal operation.  The LICOR pressure was estimated by subtracting 1.6 mbar from the sea surface atmospheric pressure.  The offset between the LICOR and atmospheric pressures was measured during the first cruise, WFCH20220424.  
+  The XCO2 output of the LI-6262 was recalculated with the updated pressures before processing the pCO2 raw data.
+  Original Data Location: http://www.aoml.noaa.gov/ocd/ocdweb/charcot/charcot_introduction.html 
+  Full unprocessed data files from analytical instrument including flow information and TSG data at time of sampling can be obtained upon request. </Additional_Information>
+  <Citation></Citation>
+  <Preliminary_Quality_control>NA</Preliminary_Quality_control>
+  <form_type>underway</form_type>
+</x_tags>

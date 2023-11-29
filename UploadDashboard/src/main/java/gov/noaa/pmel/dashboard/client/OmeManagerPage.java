@@ -35,19 +35,21 @@ import java.util.Date;
  */
 public class OmeManagerPage extends CompositeWithUsername {
 
-    private static final String TITLE_TEXT = "Edit OME Metadata";
+    private static final String TITLE_TEXT = "Manage SOCAT Metadata";
     private static final String WELCOME_INTRO = "Logged in as ";
     private static final String LOGOUT_TEXT = "Logout";
     private static final String UPLOAD_TEXT = "Upload";
     private static final String CANCEL_TEXT = "Cancel";
 
     private static final String CRUISE_HTML_INTRO_PROLOGUE = "<p>" +
-            "At this time, the system can upload CDIAC-style OME \"&lt;x_tags&gt;\" XML and OADS \"&lt;oads_metadata&gt;\"XML metadata files. " +
+            "At this time, the system can upload CDIAC-style OME \"&lt;x_tags&gt;\" XML and OADS \"&lt;oads_metadata&gt;\"XML metadata files.<br>" +
+            "<br>" +
             "A new Online Metadata Editor is available at: " +
             "<a href='https://data.pmel.noaa.gov/sdig/socat/MetadataEditor.html' target='_blank'>https://data.pmel.noaa.gov/sdig/socat/MetadataEditor.html</a>" +
             "</p>" +
             "<p>" +
-            "Please upload whatever other metadata files you have as \"Supplemental Documents\". " +
+            "Please upload other metadata files you have as \"Supplemental Documents\".<br>" +
+            "<br>" +
             "A spreadsheet for providing metadata can be obtained using the \"metadata template\" " +
             "link on the SOCAT info page at <a href=\"https://www.socat.info/index.php/data-upload-and-quality-control/\" " +
             "target=\"_blank\">https://www.socat.info/index.php/data-upload-and-quality-control/</a> " +

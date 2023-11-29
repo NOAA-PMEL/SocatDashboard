@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<oads_metadata xmlns="http://ncei.noaa.gov/oads/v_a0_2_2s" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="a0.2.2" xsi:schemaLocation="http://ncei.noaa.gov/oads/v_a0_2_2s https://www.pmel.noaa.gov/sdig/oap/a0.2.2/oads_metadata_a0.2.2.xsd">
+    <investigators>
+        <investigator>
+            <name>
+                <first>Rik</first>
+                <last>Wanninkhof</last>
+            </name>
+            <organization>NOAA/Atlantic Oceanographic &amp; Meteorological Laboratory</organization>
+            <contactInfo>
+                <address>
+                    <deliveryPoint index="1">4301 Rickenbacker Causeway, Miami Fl, 33149</deliveryPoint>
+                    <deliveryPoint index="2"/>
+                </address>
+                <phone>305-361-4379</phone>
+                <email>Rik.Wanninkhof@noaa.gov</email>
+            </contactInfo>
+        </investigator>
+        <investigator>
+            <name>
+                <first>Denis</first>
+                <last>Pierrot</last>
+            </name>
+            <organization>NOAA/AOML CIMAS</organization>
+            <contactInfo>
+                <address>
+                    <deliveryPoint index="1">4301 Rickenbacker Causeway, Miami, Fl 33149</deliveryPoint>
+                    <deliveryPoint index="2"/>
+                </address>
+                <phone>(305) 361-4441</phone>
+                <email>Denis.Pierrot@noaa.gov</email>
+            </contactInfo>
+        </investigator>
+    </investigators>
+    <dataSubmitter>
+        <name>
+            <first>Kevin</first>
+            <last>Sullivan</last>
+        </name>
+        <organization>NOAA/Atlantic Oceanographic &amp; Meteorological Laboratory</organization>
+        <contactInfo>
+            <address>
+                <deliveryPoint index="1">4301 Rickenbacker Causeway</deliveryPoint>
+                <deliveryPoint index="2"/>
+            </address>
+            <phone>305-361-4382</phone>
+            <email>Kevin.Sullivan@noaa.gov</email>
+        </contactInfo>
+    </dataSubmitter>
+    <temporalExtents>
+        <startDate>2022-03-01</startDate>
+        <endDate>2022-03-22</endDate>
+    </temporalExtents>
+    <spatialExtents>
+        <bounds>
+            <westernBounds>-76.2</westernBounds>
+            <easternBounds>-70.6</easternBounds>
+            <northernBounds>41.5</northernBounds>
+            <southernBounds>34.3</southernBounds>
+        </bounds>
+    </spatialExtents>
+    <spatialReference>WGS 84</spatialReference>
+    <fundingInfo>
+        <source>
+            <agency>NOAA Climate Program Office; NOAA Ocean Acidification Program</agency>
+            <identifier/>
+        </source>
+    </fundingInfo>
+    <platforms>
+        <platform>
+            <name>R/V Henry B. Bigelow</name>
+            <identifier>33HH</identifier>
+            <type>Ship</type>
+            <owner>NOAA</owner>
+        </platform>
+    </platforms>
+    <expocodes>
+        <expocode>33HH20220301</expocode>
+    </expocodes>
+    <cruiseIds>
+        <cruiseId>HB2202-Leg1</cruiseId>
+        <cruiseId>Spring</cruiseId>
+        <cruiseId>Bottom</cruiseId>
+        <cruiseId>Trawl</cruiseId>
+        <cruiseId>Survey</cruiseId>
+    </cruiseIds>
+    <supplementalInfo>Port of Call: Newport, RI
+Experiment Type: Research Cruise
+Cruise Info: AOML_SOOP_OA
+The analytical system operated fine during this cruise. 
+  The SBE38 SST sensor was replaced at the start of this field season, and for an undetermined reason, the measured SST values were not reliable. 
+  The data from one of the ship's through hull sensors (MidSea at 3 meters) was used for SST values.  A bracketing 1-minute average of this sensor showed smooth, reliable behavior and was used for processing. 
+  For 70 minutes starting at 13:40 on 11 March, the through-hull SST sensors were not recorded.  For this interval, SST was estimated from the equilibrator temperature.  
+  Original Data Location:  http://www.aoml.noaa.gov/ocd/ocdweb/bigelow/bigelow_introduction.html . 
+  Full unprocessed data files from analytical instrument including flow information plus meteorological and TSG data at time of sampling can be obtained upon request.</supplementalInfo>
+    <variables>
+        <variable xsi:type="co2_socat" name="xCO2_EQU_ppm">
+            <fullName>Mole fraction of CO2 in the equilibrator headspace (dry) at equilibrator temperature (ppm)</fullName>
+            <datasetVarName>xCO2_EQU_ppm</datasetVarName>
+            <variableType>measured in-situ</variableType>
+            <measuredOrCalculated>Calculated</measuredOrCalculated>
+            <observationType>Surface Underway</observationType>
+            <units>ppm</units>
+            <uncertainty>2 ppm</uncertainty>
+            <qcFlag/>
+            <researcher/>
+            <methodReference>Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, T. Johannessen, A. Olsen, R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway pCO2 measuring systems and data reduction routines, Deep-Sea Res II, 56, 512-522.</methodReference>
+            <calculationMethod>
+                <description>IR</description>
+            </calculationMethod>
+            <samplingInstrument>Equilibrator: Primary equilibrator is vented through a secondary equilibrator.</samplingInstrument>
+            <analyzingInstrument>CO2 Sensor: Manufacturer: LI-COR; Model: 6262; Calibration: The analyzer is calibrated every 3.5 hours with field standards that in turn were calibrated with primary standards that are directly traceable to the WMO X2019 scale. The zero gas is ultra-high purity air.; Number of non-zero gases: 4; Measured CO2 Parameters: xco2(dry); Instrument is located in an air-conditioned laboratory.  Ultra-High Purity air (0.0 ppm CO2) and the high standard gas are used to zero and span the LI-COR analyzer.</analyzingInstrument>
+            <detailedAnalyzingInfo>Resolution/Precision: 0.01 ppm
+Frequency: Every 140 seconds, except during calibration
+Details of CO2 Sensing: details of CO2 sensing (not required)</detailedAnalyzingInfo>
+            <standardization>
+                <description>The analyzer is calibrated every 3.5 hours with field standards that in turn were calibrated with primary standards that are directly traceable to the WMO X2019 scale. The zero gas is ultra-high purity air.</description>
+                <frequency>calibration gas 1: used every ~4.5 hours., calibration gas 2: used every ~4.5 hours., calibration gas 3: used every ~4.5 hours., calibration gas 4: used every ~4.5 hours., calibration gas 5: used every ~23.5 hours.</frequency>
+                <standardGas>
+                    <manufacturer>JA02280 from owned by AOML</manufacturer>
+                    <concentration>233.51 ppm CO2</concentration>
+                    <uncertainty>0.01 ppm</uncertainty>
+                </standardGas>
+                <standardGas>
+                    <manufacturer>JA02264 from owned by AOML</manufacturer>
+                    <concentration>326.30 ppm CO2</concentration>
+                    <uncertainty>0.01 ppm</uncertainty>
+                </standardGas>
+                <standardGas>
+                    <manufacturer>JB03592 from owned by AOML</manufacturer>
+                    <concentration>422.43 ppm CO2</concentration>
+                    <uncertainty>0.01 ppm</uncertainty>
+                </standardGas>
+                <standardGas>
+                    <manufacturer>JA02647 from owned by AOML</manufacturer>
+                    <concentration>561.46 ppm CO2</concentration>
+                    <uncertainty>0.01 ppm</uncertainty>
+                </standardGas>
+                <standardGas>
+                    <manufacturer>LL100000 from owned by AOML</manufacturer>
+                    <concentration>0.00 ppm CO2</concentration>
+                    <uncertainty>0.01 ppm</uncertainty>
+                </standardGas>
+            </standardization>
+            <gasDetector>
+                <manufacturer>LI-COR</manufacturer>
+                <model>6262</model>
+                <resolution>0.01 ppm</resolution>
+                <uncertainty>2 ppm</uncertainty>
+            </gasDetector>
+            <co2ReportTemperature>equilibrator temperature</co2ReportTemperature>
+            <locationSeawaterIntake>Bow</locationSeawaterIntake>
+            <depthSeawaterIntake>Sampling Depth: 3 meters</depthSeawaterIntake>
+            <equilibrator>
+                <type>Spray head above dynamic pool with thermal jacket</type>
+                <volume>0.95 L; Water Volume: 0.4 L; Gas Volume: 0.55 L</volume>
+                <waterFlowRate>1.5 - 2.0 L/min</waterFlowRate>
+                <gasFlowRate>70 - 150 ml/min</gasFlowRate>
+                <temperatureMeasurement>
+                    <method>Equilibrator Temperature Sensor: Manufacturer: Hart; Model: 1523; Calibration: Factory calibration; Resolution is taken as Precision.</method>
+                    <sensor/>
+                </temperatureMeasurement>
+                <pressureMeasurement>
+                    <method>Equilibrator Pressure Sensor: Manufacturer: Setra; Model: 270; Calibration: Factory calibration; Manufacturer's Resolution is taken as Precision.</method>
+                    <sensor/>
+                </pressureMeasurement>
+            </equilibrator>
+            <co2GasDryingMethod>Gas stream passes through a thermoelectric condenser (~5 °C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).</co2GasDryingMethod>
+            <totalMeasurementPressure/>
+        </variable>
+        <variable xsi:type="co2_socat" name="xCO2_ATM_ppm">
+            <fullName>Mole fraction of CO2 measured in dry outside air (ppm)</fullName>
+            <datasetVarName>xCO2_ATM_ppm</datasetVarName>
+            <variableType>measured in-situ</variableType>
+            <measuredOrCalculated>Calculated</measuredOrCalculated>
+            <observationType>Surface Underway</observationType>
+            <units>ppm</units>
+            <uncertainty>0.5 ppm</uncertainty>
+            <qcFlag/>
+            <researcher/>
+            <methodReference>Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, T. Johannessen, A. Olsen, R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway pCO2 measuring systems and data reduction routines, Deep-Sea Res II, 56, 512-522.</methodReference>
+            <calculationMethod>
+                <description>IR</description>
+            </calculationMethod>
+            <analyzingInstrument>CO2 Sensor: Manufacturer: LI-COR; Model: 6262; Calibration: The analyzer is calibrated every 3.5 hours with field standards that in turn were calibrated with primary standards that are directly traceable to the WMO X2019 scale. The zero gas is ultra-high purity air.; Number of non-zero gases: 4; Measured CO2 Parameters: xco2(dry); Instrument is located in an air-conditioned laboratory.  Ultra-High Purity air (0.0 ppm CO2) and the high standard gas are used to zero and span the LI-COR analyzer.</analyzingInstrument>
+            <detailedAnalyzingInfo>Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).
+Sampling location: Mast above the bridge, ~18 meters above sea surface
+Resolution/Precision: 0.01 ppm
+Details of CO2 Sensing: details of CO2 sensing (not required)
+Measurement: Yes, 5 readings in a group every 3.5 hours</detailedAnalyzingInfo>
+            <gasDetector/>
+            <equilibrator>
+                <temperatureMeasurement>
+                    <sensor/>
+                </temperatureMeasurement>
+                <pressureMeasurement>
+                    <sensor/>
+                </pressureMeasurement>
+            </equilibrator>
+            <totalMeasurementPressure/>
+        </variable>
+        <variable xsi:type="co2_socat" name="xCO2_ATM_interpolated_ppm">
+            <fullName>Mole fraction of CO2 in outside air associated with each water analysis.  These values are interpolated between the bracketing averaged good xCO2_ATM analyses (ppm)</fullName>
+            <datasetVarName>xCO2_ATM_interpolated_ppm</datasetVarName>
+            <variableType>computed</variableType>
+            <measuredOrCalculated>Calculated</measuredOrCalculated>
+            <observationType>Surface Underway</observationType>
+            <units>ppm</units>
+            <uncertainty>0.5 ppm</uncertainty>
+            <qcFlag/>
+            <researcher/>
+            <methodReference>Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, T. Johannessen, A. Olsen, R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway pCO2 measuring systems and data reduction routines, Deep-Sea Res II, 56, 512-522.</methodReference>
+            <calculationMethod>
+                <description>IR</description>
+            </calculationMethod>
+            <analyzingInstrument>CO2 Sensor: Manufacturer: LI-COR; Model: 6262; Calibration: The analyzer is calibrated every 3.5 hours with field standards that in turn were calibrated with primary standards that are directly traceable to the WMO X2019 scale. The zero gas is ultra-high purity air.; Number of non-zero gases: 4; Measured CO2 Parameters: xco2(dry); Instrument is located in an air-conditioned laboratory.  Ultra-High Purity air (0.0 ppm CO2) and the high standard gas are used to zero and span the LI-COR analyzer.</analyzingInstrument>
+            <detailedAnalyzingInfo>Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).
+Sampling location: Mast above the bridge, ~18 meters above sea surface
+Resolution/Precision: 0.01 ppm
+Details of CO2 Sensing: details of CO2 sensing (not required)
+Measurement: Yes, 5 readings in a group every 3.5 hours</detailedAnalyzingInfo>
+            <gasDetector/>
+            <equilibrator>
+                <temperatureMeasurement>
+                    <sensor/>
+                </temperatureMeasurement>
+                <pressureMeasurement>
+                    <sensor/>
+                </pressureMeasurement>
+            </equilibrator>
+            <totalMeasurementPressure/>
+        </variable>
+        <variable xsi:type="co2_socat" name="fCO2_SW@SST_uatm">
+            <fullName>Fugacity of CO2 in sea water at SST and 100% humidity (μatm)</fullName>
+            <datasetVarName>fCO2_SW@SST_uatm</datasetVarName>
+            <variableType>measured in-situ</variableType>
+            <measuredOrCalculated>Calculated</measuredOrCalculated>
+            <observationType>Surface Underway</observationType>
+            <units>μatm</units>
+            <uncertainty>2 μatm</uncertainty>
+            <qcFlag>
+                <description>Given in column: WOCE_QC_FLAG</description>
+            </qcFlag>
+            <researcher/>
+            <methodReference>Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, T. Johannessen, A. Olsen, R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway pCO2 measuring systems and data reduction routines, Deep-Sea Res II, 56, 512-522.</methodReference>
+            <calculationMethod>
+                <description>IR</description>
+            </calculationMethod>
+            <samplingInstrument>Equilibrator: Primary equilibrator is vented through a secondary equilibrator.</samplingInstrument>
+            <analyzingInstrument>CO2 Sensor: Manufacturer: LI-COR; Model: 6262; Calibration: The analyzer is calibrated every 3.5 hours with field standards that in turn were calibrated with primary standards that are directly traceable to the WMO X2019 scale. The zero gas is ultra-high purity air.; Number of non-zero gases: 4; Measured CO2 Parameters: xco2(dry); Instrument is located in an air-conditioned laboratory.  Ultra-High Purity air (0.0 ppm CO2) and the high standard gas are used to zero and span the LI-COR analyzer.</analyzingInstrument>
+            <detailedAnalyzingInfo>Resolution/Precision: 0.01 μatm
+Frequency: Every 140 seconds, except during calibration
+Details of CO2 Sensing: details of CO2 sensing (not required)</detailedAnalyzingInfo>
+            <standardization>
+                <description>The analyzer is calibrated every 3.5 hours with field standards that in turn were calibrated with primary standards that are directly traceable to the WMO X2019 scale. The zero gas is ultra-high purity air.</description>
+                <frequency>calibration gas 1: used every ~4.5 hours., calibration gas 2: used every ~4.5 hours., calibration gas 3: used every ~4.5 hours., calibration gas 4: used every ~4.5 hours., calibration gas 5: used every ~23.5 hours.</frequency>
+                <standardGas>
+                    <manufacturer>JA02280 from owned by AOML</manufacturer>
+                    <concentration>233.51 ppm CO2</concentration>
+                    <uncertainty>0.01 ppm</uncertainty>
+                </standardGas>
+                <standardGas>
+                    <manufacturer>JA02264 from owned by AOML</manufacturer>
+                    <concentration>326.30 ppm CO2</concentration>
+                    <uncertainty>0.01 ppm</uncertainty>
+                </standardGas>
+                <standardGas>
+                    <manufacturer>JB03592 from owned by AOML</manufacturer>
+                    <concentration>422.43 ppm CO2</concentration>
+                    <uncertainty>0.01 ppm</uncertainty>
+                </standardGas>
+                <standardGas>
+                    <manufacturer>JA02647 from owned by AOML</manufacturer>
+                    <concentration>561.46 ppm CO2</concentration>
+                    <uncertainty>0.01 ppm</uncertainty>
+                </standardGas>
+                <standardGas>
+                    <manufacturer>LL100000 from owned by AOML</manufacturer>
+                    <concentration>0.00 ppm CO2</concentration>
+                    <uncertainty>0.01 ppm</uncertainty>
+                </standardGas>
+            </standardization>
+            <gasDetector>
+                <manufacturer>LI-COR</manufacturer>
+                <model>6262</model>
+                <resolution>0.01 μatm</resolution>
+                <uncertainty>2 μatm</uncertainty>
+            </gasDetector>
+            <co2ReportTemperature>SST</co2ReportTemperature>
+            <locationSeawaterIntake>Bow</locationSeawaterIntake>
+            <depthSeawaterIntake>Sampling Depth: 3 meters</depthSeawaterIntake>
+            <equilibrator>
+                <type>Spray head above dynamic pool with thermal jacket</type>
+                <volume>0.95 L; Water Volume: 0.4 L; Gas Volume: 0.55 L</volume>
+                <vented>Yes</vented>
+                <waterFlowRate>1.5 - 2.0 L/min</waterFlowRate>
+                <gasFlowRate>70 - 150 ml/min</gasFlowRate>
+                <temperatureMeasurement>
+                    <method>Equilibrator Temperature Sensor: Manufacturer: Hart; Model: 1523; Calibration: Factory calibration; Resolution is taken as Precision.</method>
+                    <sensor/>
+                </temperatureMeasurement>
+                <pressureMeasurement>
+                    <method>Equilibrator Pressure Sensor: Manufacturer: Setra; Model: 270; Calibration: Factory calibration; Manufacturer's Resolution is taken as Precision.</method>
+                    <sensor/>
+                </pressureMeasurement>
+            </equilibrator>
+            <co2GasDryingMethod>Gas stream passes through a thermoelectric condenser (~5 °C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).</co2GasDryingMethod>
+            <totalMeasurementPressure/>
+        </variable>
+        <variable xsi:type="co2_socat" name="fCO2_ATM_interpolated_uatm">
+            <fullName>Fugacity of CO2 in air corresponding to the interpolated xCO2 at SST and 100% humidity (μatm)</fullName>
+            <datasetVarName>fCO2_ATM_interpolated_uatm</datasetVarName>
+            <variableType>computed</variableType>
+            <measuredOrCalculated>Calculated</measuredOrCalculated>
+            <observationType>Surface Underway</observationType>
+            <units>μatm</units>
+            <uncertainty>0.5 μatm</uncertainty>
+            <qcFlag/>
+            <researcher/>
+            <methodReference>Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, T. Johannessen, A. Olsen, R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway pCO2 measuring systems and data reduction routines, Deep-Sea Res II, 56, 512-522.</methodReference>
+            <calculationMethod>
+                <description>IR</description>
+            </calculationMethod>
+            <analyzingInstrument>CO2 Sensor: Manufacturer: LI-COR; Model: 6262; Calibration: The analyzer is calibrated every 3.5 hours with field standards that in turn were calibrated with primary standards that are directly traceable to the WMO X2019 scale. The zero gas is ultra-high purity air.; Number of non-zero gases: 4; Measured CO2 Parameters: xco2(dry); Instrument is located in an air-conditioned laboratory.  Ultra-High Purity air (0.0 ppm CO2) and the high standard gas are used to zero and span the LI-COR analyzer.</analyzingInstrument>
+            <detailedAnalyzingInfo>Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).
+Sampling location: Mast above the bridge, ~18 meters above sea surface
+Resolution/Precision: 0.01 μatm
+Details of CO2 Sensing: details of CO2 sensing (not required)
+Measurement: Yes, 5 readings in a group every 3.5 hours</detailedAnalyzingInfo>
+            <gasDetector/>
+            <equilibrator>
+                <temperatureMeasurement>
+                    <sensor/>
+                </temperatureMeasurement>
+                <pressureMeasurement>
+                    <sensor/>
+                </pressureMeasurement>
+            </equilibrator>
+            <totalMeasurementPressure/>
+        </variable>
+        <variable name="PRES_EQU_hPa">
+            <fullName>Barometric pressure in the equilibrator headspace (hPa)</fullName>
+            <datasetVarName>PRES_EQU_hPa</datasetVarName>
+            <variableType>measured in-situ</variableType>
+            <observationType>Surface Underway</observationType>
+            <units>hPa</units>
+            <uncertainty>0.15 hPa</uncertainty>
+            <qcFlag/>
+            <researcher/>
+            <analyzingInstrument>Equilibrator Pressure Sensor: Manufacturer: Setra; Model: 270; Calibration: Factory calibration; Manufacturer's Resolution is taken as Precision.</analyzingInstrument>
+            <detailedAnalyzingInfo>Pressure Correction: Normalized: yes
+Sampling location: Attached to equilibrator headspace. Differential pressure reading from Setra 239 attached to the equilibrator headspace is added to the pressure reading from the LICOR, which is measured by an external Setra 270 connected to the exit of the analyzer.
+Resolution/Precision: 0.015 hPa</detailedAnalyzingInfo>
+        </variable>
+        <variable name="PRES_ATM@SSP_hPa">
+            <fullName>Barometric pressure measured outside, corrected to sea level (hPa)</fullName>
+            <datasetVarName>PRES_ATM@SSP_hPa</datasetVarName>
+            <variableType>measured in-situ</variableType>
+            <observationType>Surface Underway</observationType>
+            <units>hPa</units>
+            <uncertainty>0.15 hPa</uncertainty>
+            <qcFlag/>
+            <researcher/>
+            <analyzingInstrument>Atmospheric Pressure Sensor: Manufacturer: Vaisala; Model: PTB220; Calibration: Factory calibration; Manufacturer's Resolution is taken as Precision; Maintained by ship.</analyzingInstrument>
+            <detailedAnalyzingInfo>Pressure Correction: Normalized: yes
+Sampling location: On mast above the bridge at ~18 m above sea surface water
+Resolution/Precision: 0.01 hPa</detailedAnalyzingInfo>
+        </variable>
+        <variable name="TEMP_EQU_C">
+            <fullName>Water temperature in equilibrator (°C)</fullName>
+            <datasetVarName>TEMP_EQU_C</datasetVarName>
+            <variableType>measured in-situ</variableType>
+            <observationType>Surface Underway</observationType>
+            <units>deg C</units>
+            <uncertainty>0.015 deg C</uncertainty>
+            <qcFlag/>
+            <researcher/>
+            <analyzingInstrument>Equilibrator Temperature Sensor: Manufacturer: Hart; Model: 1523; Calibration: Factory calibration; Resolution is taken as Precision.</analyzingInstrument>
+            <detailedAnalyzingInfo>Sampling location: Inserted into equilibrator ~5 cm below water level
+Resolution/Precision: 0.0003 deg C</detailedAnalyzingInfo>
+        </variable>
+        <variable name="SST_C">
+            <fullName>Sea surface temperature (°C)</fullName>
+            <datasetVarName>SST_C</datasetVarName>
+            <variableType>measured in-situ</variableType>
+            <observationType>Surface Underway</observationType>
+            <units>deg C</units>
+            <uncertainty>0.17 deg C</uncertainty>
+            <qcFlag/>
+            <researcher/>
+            <analyzingInstrument>Water Temperature Sensor: Manufacturer: AirMar; Model: B17-S-Temp; Calibration: Factory calibration; Manufacturer's Resolution is taken as Precision; 'MidSea' Sensor, maintained by the ship.</analyzingInstrument>
+            <detailedAnalyzingInfo>Sampling location: Through starboard hull at 3 meters depth
+Resolution/Precision: 0.01 deg C</detailedAnalyzingInfo>
+        </variable>
+        <variable name="SAL_permil">
+            <fullName>Sea surface salinity on Practical Salinity Scale (o/oo)</fullName>
+            <datasetVarName>SAL_permil</datasetVarName>
+            <variableType>measured in-situ</variableType>
+            <observationType>Surface Underway</observationType>
+            <units>ppt</units>
+            <uncertainty>0.005 ppt</uncertainty>
+            <qcFlag/>
+            <researcher/>
+            <analyzingInstrument>Salinity Sensor: Manufacturer: Seabird; Model: SBE 45; Calibration: Factory calibration; Manufacturer's Resolution is taken as Precision; Maintained by the ship.</analyzingInstrument>
+            <detailedAnalyzingInfo>Sampling location: In dry lab after a debubbler, next to CO2 system
+Resolution/Precision: 0.0002 ppt</detailedAnalyzingInfo>
+        </variable>
+        <variable name="dfCO2_uatm">
+            <fullName>Sea water fCO2 minus interpolated air fCO2 (μatm)</fullName>
+            <datasetVarName>dfCO2_uatm</datasetVarName>
+            <units>μatm</units>
+            <qcFlag/>
+            <researcher/>
+        </variable>
+        <variable name="WOCE_QC_FLAG">
+            <fullName>Quality control flag for fCO2 values (2=good, 3=questionable)</fullName>
+            <datasetVarName>WOCE_QC_FLAG</datasetVarName>
+            <units>None</units>
+            <qcFlag/>
+            <researcher/>
+        </variable>
+        <variable name="QC_SUBFLAG">
+            <fullName>Quality control subflag for fCO2 values, provides explanation when QC flag=3</fullName>
+            <datasetVarName>QC_SUBFLAG</datasetVarName>
+            <units>None</units>
+            <qcFlag/>
+            <researcher/>
+        </variable>
+    </variables>
+</oads_metadata>
