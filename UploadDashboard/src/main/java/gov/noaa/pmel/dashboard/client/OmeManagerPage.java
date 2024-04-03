@@ -59,7 +59,7 @@ public class OmeManagerPage extends CompositeWithUsername {
     private static final String CRUISE_HTML_INTRO_EPILOGUE = "</li></ul></p>";
 
     private static final String NO_FILE_ERROR_MSG =
-            "Please select an SOCAT OME XML metadata file to upload";
+            "Please select a SOCAT XML metadata file to upload";
     private static final String NO_SCHEMA_SELECTED =
             "Please select the XML document schema.";
 

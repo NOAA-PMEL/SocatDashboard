@@ -29,7 +29,6 @@ import gov.noaa.pmel.socatmetadata.person.Person;
 import gov.noaa.pmel.socatmetadata.person.Submitter;
 import gov.noaa.pmel.socatmetadata.platform.Platform;
 import gov.noaa.pmel.socatmetadata.platform.PlatformType;
-import gov.noaa.pmel.socatmetadata.test.GasSensorTest;
 import gov.noaa.pmel.socatmetadata.translate.CdiacReader.VarType;
 import static gov.noaa.pmel.socatmetadata.translate.CdiacReader.VarType.*;
 import gov.noaa.pmel.socatmetadata.translate.DocumentHandler;

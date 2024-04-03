@@ -9,7 +9,7 @@ import gov.noaa.pmel.dashboard.metadata.OmeMetadataInterface;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.tws.util.JWhich;
+// import gov.noaa.pmel.tws.util.JWhich;
 
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
@@ -40,7 +40,6 @@ public class OadsPdfGenerator implements PdfGenerator {
     private MetadataFileHandler metadataHandler;
     private DataFileHandler cruiseHandler;
     private File fopResourcesDir;
-//    private File xsltFile;
     private FopFactory fopFactory;
     private TransformerFactory transFactory;
 
@@ -152,7 +151,7 @@ public class OadsPdfGenerator implements PdfGenerator {
             }
             try {
                 foUserAgent = fopFactory.newFOUserAgent();
-                foUserAgent.setTitle(upperExpo + " OADS Metadata");
+                foUserAgent.setTitle(upperExpo + " SOCAT Metadata");
             } catch ( Throwable ex ) {
                 throw new IOException("Unable to create the FOUserAgent: " + ex.getMessage());
             }
@@ -219,7 +218,7 @@ public class OadsPdfGenerator implements PdfGenerator {
             TransformerFactory xfrmFactory = TransformerFactory.newInstance();
             Transformer xfrm = xfrmFactory.newTransformer(new StreamSource(xsltFile));
             xfrm.setParameter("versionParam", "2.0");
-            JWhich.which(xfrm.getClass().getName());
+            // JWhich.which(xfrm.getClass().getName());
             xfrm.transform(new StreamSource(inXml), new StreamResult(outXfrm));
         } catch (Exception ex) {
             System.out.println("Exception outputting FO file.");
