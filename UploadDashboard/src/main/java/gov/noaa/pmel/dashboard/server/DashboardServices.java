@@ -625,6 +625,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                     itsLogger.info(message);
                 }
             } catch ( Exception ex ) {
+            	ex.printStackTrace();
+            	itsLogger.error(String.valueOf(ex), ex);
                 if ( errmsgs.length() > 0 )
                     errmsgs.append('\n');
                 errmsgs.append("Unable to suspend " + datasetId);

@@ -212,6 +212,7 @@ public class DatasetSubmitter {
                     databaseHandler.addDatasetQCEvents(datasetQCEvents);
 
                 } catch ( Exception ex ) {
+                	itsLogger.info(datasetId + ": unacceptable; " + ex.getMessage());
                     errorMsgs.add(datasetId + ": unacceptable; " + ex.getMessage());
                     continue;
                 }
@@ -281,6 +282,8 @@ public class DatasetSubmitter {
                 try {
                     filesBundler.sendOrigFilesBundle(datasetId, commitMsg, userRealName, userEmail);
                 } catch ( Exception ex ) {
+                    itsLogger.info("Failed to submit request for immediate archival of " +
+                            datasetId + ": " + ex.getMessage());
                     errorMsgs.add("Failed to submit request for immediate archival of " +
                             datasetId + ": " + ex.getMessage());
                     continue;
