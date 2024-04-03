@@ -207,6 +207,20 @@ public class DatabaseRequestHandler {
         return catConn;
     }
 
+    private static PreparedStatement prepareStatement(Connection con, String sql) 
+    		throws SQLException 
+	{
+    	return prepareStatement(con, sql, false);
+	}
+    
+    private static PreparedStatement prepareStatement(Connection con, String sql, boolean isUpdate) 
+    		throws SQLException 
+    {
+    	int concur = isUpdate ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY;
+    	PreparedStatement pstmt = con.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, concur);
+    	return pstmt;
+    }
+    
     /**
      * Get the ID for a reviewer from the reviewers database table. Uses the username for the reviewer unless it is
      * empty, in which case it uses the realname of the reviewer.
@@ -227,12 +241,12 @@ public class DatabaseRequestHandler {
         int reviewerId;
         PreparedStatement prepStmt;
         if ( !username.isEmpty() ) {
-            prepStmt = catConn.prepareStatement("SELECT `reviewer_id` FROM `" +
+            prepStmt = prepareStatement(catConn,"SELECT `reviewer_id` FROM `" +
                     REVIEWERS_TABLE_NAME + "` WHERE `username` = ?;");
             prepStmt.setString(1, username);
         }
         else {
-            prepStmt = catConn.prepareStatement("SELECT `reviewer_id` FROM `" +
+            prepStmt = prepareStatement(catConn,"SELECT `reviewer_id` FROM `" +
                     REVIEWERS_TABLE_NAME + "` WHERE `realname` = ?;");
             prepStmt.setString(1, realname);
         }
@@ -272,7 +286,7 @@ public class DatabaseRequestHandler {
         String realname = null;
         Connection catConn = makeConnection(false);
         try {
-            PreparedStatement prepStmt = catConn.prepareStatement("SELECT `realname` FROM `" +
+            PreparedStatement prepStmt = prepareStatement(catConn,"SELECT `realname` FROM `" +
                     REVIEWERS_TABLE_NAME + "` WHERE `username` = ?;");
             prepStmt.setString(1, username);
             ResultSet results = prepStmt.executeQuery();
@@ -306,7 +320,7 @@ public class DatabaseRequestHandler {
         String username = null;
         Connection catConn = makeConnection(false);
         try {
-            PreparedStatement prepStmt = catConn.prepareStatement("SELECT `username` FROM `" +
+            PreparedStatement prepStmt = prepareStatement(catConn,"SELECT `username` FROM `" +
                     REVIEWERS_TABLE_NAME + "` WHERE `realname` = ?;");
             prepStmt.setString(1, realname);
             ResultSet results = prepStmt.executeQuery();
@@ -340,7 +354,7 @@ public class DatabaseRequestHandler {
         String userEmail = null;
         Connection catConn = makeConnection(false);
         try {
-            PreparedStatement prepStmt = catConn.prepareStatement("SELECT `email` FROM `" +
+            PreparedStatement prepStmt = prepareStatement(catConn,"SELECT `email` FROM `" +
                     REVIEWERS_TABLE_NAME + "` WHERE `username` = ?;");
             prepStmt.setString(1, username);
             ResultSet results = prepStmt.executeQuery();
@@ -372,7 +386,7 @@ public class DatabaseRequestHandler {
     public void addDatasetQCEvents(Collection<QCEvent> qcEvents) throws SQLException {
         Connection catConn = makeConnection(true);
         try {
-            PreparedStatement addPrepStmt = catConn.prepareStatement("INSERT INTO `" +
+            PreparedStatement addPrepStmt = prepareStatement(catConn,"INSERT INTO `" +
                     QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, `expocode`, " +
                     "`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
                     "VALUES(?, ?, ?, ?, ?, ?, ?);");
@@ -417,7 +431,7 @@ public class DatabaseRequestHandler {
         Connection catConn = makeConnection(false);
         try {
             // Get all the QC events for this data set, ordered so the latest are last
-            PreparedStatement getPrepStmt = catConn.prepareStatement(
+            PreparedStatement getPrepStmt = prepareStatement(catConn,
                     "SELECT `qc_flag`, `qc_time`, `region_id` FROM `" + QCEVENTS_TABLE_NAME +
                             "` WHERE `expocode` = ? ORDER BY `qc_time` ASC;");
             getPrepStmt.setString(1, expocode);
@@ -536,7 +550,7 @@ public class DatabaseRequestHandler {
         Connection catConn = makeConnection(false);
         try {
             // Get all the QC events for this data set, ordered so the latest are last
-            PreparedStatement getPrepStmt = catConn.prepareStatement(
+            PreparedStatement getPrepStmt = prepareStatement(catConn,
                     "SELECT `socat_version` FROM `" + QCEVENTS_TABLE_NAME +
                             "` WHERE `expocode` = ? AND `region_id` = '" + DashboardUtils.REGION_ID_GLOBAL +
                             "' AND ( `qc_flag` LIKE '" + DatasetQCStatus.FLAG_NEW_AWAITING_QC +
@@ -623,7 +637,7 @@ public class DatabaseRequestHandler {
         ArrayList<QCEvent> eventsList = new ArrayList<QCEvent>();
         Connection catConn = makeConnection(false);
         try {
-            PreparedStatement prepStmt = catConn.prepareStatement(
+            PreparedStatement prepStmt = prepareStatement(catConn,
                     "SELECT * FROM `" + QCEVENTS_TABLE_NAME + "` JOIN `" +
                             REVIEWERS_TABLE_NAME + "` ON " + QCEVENTS_TABLE_NAME +
                             ".reviewer_id = " + REVIEWERS_TABLE_NAME + ".reviewer_id WHERE " +
@@ -658,11 +672,11 @@ public class DatabaseRequestHandler {
     public void addDataQCEvent(Collection<DataQCEvent> woceEvents) throws SQLException {
         Connection catConn = makeConnection(true);
         try {
-            PreparedStatement eventPrepStmt = catConn.prepareStatement("INSERT INTO `" +
+            PreparedStatement eventPrepStmt = prepareStatement(catConn,"INSERT INTO `" +
                     WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
                     "`expocode`, `socat_version`, `data_name`, `reviewer_id`, " +
                     "`woce_comment`) VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
-            PreparedStatement locPrepStmt = catConn.prepareStatement("INSERT INTO `" + WOCELOCATIONS_TABLE_NAME +
+            PreparedStatement locPrepStmt = prepareStatement(catConn,"INSERT INTO `" + WOCELOCATIONS_TABLE_NAME +
                     "` (`woce_id`, `row_num`, `longitude`, `latitude`, `data_time`, `data_value`) " +
                     "VALUES (?, ?, ?, ?, ?, ?);");
             for (DataQCEvent event : woceEvents) {
@@ -685,7 +699,9 @@ public class DatabaseRequestHandler {
 
                 // Get the woce_id for the added WOCE event
                 long woceId;
-                ResultSet results = catConn.createStatement().executeQuery("SELECT LAST_INSERT_ID();");
+                ResultSet results = catConn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, 
+                											ResultSet.CONCUR_READ_ONLY)
+                								.executeQuery("SELECT LAST_INSERT_ID();");
                 try {
                     if ( !results.first() )
                         throw new SQLException("Unexpected failure to get the woce_id for an added data QC event");
@@ -819,7 +835,7 @@ public class DatabaseRequestHandler {
                 order = "DESC;";
             else
                 order = "ASC;";
-            PreparedStatement prepStmt = catConn.prepareStatement("SELECT * FROM `" +
+            PreparedStatement prepStmt = prepareStatement(catConn,"SELECT * FROM `" +
                     WOCEEVENTS_TABLE_NAME + "` JOIN `" + REVIEWERS_TABLE_NAME +
                     "` ON " + WOCEEVENTS_TABLE_NAME + ".reviewer_id = " +
                     REVIEWERS_TABLE_NAME + ".reviewer_id WHERE " +
@@ -834,7 +850,7 @@ public class DatabaseRequestHandler {
             } finally {
                 results.close();
             }
-            prepStmt = catConn.prepareStatement("SELECT * FROM `" + WOCELOCATIONS_TABLE_NAME +
+            prepStmt = prepareStatement(catConn,"SELECT * FROM `" + WOCELOCATIONS_TABLE_NAME +
                     "` WHERE `woce_id` = ? ORDER BY `row_num`;");
             for (DataQCEvent event : eventsList) {
                 // Directly modify the list of locations in the WOCE event
@@ -868,7 +884,7 @@ public class DatabaseRequestHandler {
     public void resetDataQCEvents(String expocode) throws SQLException {
         Connection catConn = makeConnection(true);
         try {
-            PreparedStatement modifyWocePrepStmt = catConn.prepareStatement(
+            PreparedStatement modifyWocePrepStmt = prepareStatement(catConn,
                     "UPDATE `" + WOCEEVENTS_TABLE_NAME + "` SET `woce_flag` = ? " +
                             "WHERE `expocode` = ? AND `woce_flag` = ?;");
             modifyWocePrepStmt.setString(2, expocode);
@@ -915,7 +931,7 @@ public class DatabaseRequestHandler {
             String renameComment = "Rename from " + oldExpocode + " to " + newExpocode;
 
             // Update the old expocode to the new expocode in the appropriate QC events
-            PreparedStatement modifyQcPrepStmt = catConn.prepareStatement(
+            PreparedStatement modifyQcPrepStmt = prepareStatement(catConn,
                     "UPDATE `" + QCEVENTS_TABLE_NAME + "` SET `expocode` = ? " +
                             "WHERE `expocode` = ? AND `qc_flag` <> ?;");
             modifyQcPrepStmt.setString(1, newExpocode);
@@ -933,7 +949,7 @@ public class DatabaseRequestHandler {
 
             // Add two dataset QC rename events; one for the old expocode and one for the new expocode
             // Also add a dataset QC comment so the rename is seen by QC-ers
-            PreparedStatement addQcPrepStmt = catConn.prepareStatement(
+            PreparedStatement addQcPrepStmt = prepareStatement(catConn,
                     "INSERT INTO `" + QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, " +
                             "`expocode`, `socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
@@ -961,7 +977,7 @@ public class DatabaseRequestHandler {
             addQcPrepStmt.executeUpdate();
 
             // Update the old expocode to the new expocode in the appropriate data QC events
-            PreparedStatement modifyWocePrepStmt = catConn.prepareStatement(
+            PreparedStatement modifyWocePrepStmt = prepareStatement(catConn,
                     "UPDATE `" + WOCEEVENTS_TABLE_NAME + "` SET `expocode` = ? " +
                             "WHERE `expocode` = ? AND `woce_flag` <> ?;");
             modifyWocePrepStmt.setString(1, newExpocode);
@@ -970,7 +986,7 @@ public class DatabaseRequestHandler {
             modifyWocePrepStmt.executeUpdate();
 
             // Add two rename WOCE events; one for the old expocode and one for the new expocode
-            PreparedStatement addWocePrepStmt = catConn.prepareStatement("INSERT INTO `" +
+            PreparedStatement addWocePrepStmt = prepareStatement(catConn,"INSERT INTO `" +
                     WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
                     "`expocode`, `socat_version`, `reviewer_id`, `woce_comment`) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
