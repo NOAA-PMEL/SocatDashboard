@@ -207,6 +207,50 @@ public class DataFileHandler extends VersionedFileHandler {
         }
         return matchingIds;
     }
+    
+    
+	public HashSet<String> getDatasetsThatMatch(String matchStr) {
+		HashSet<String> matchingIds = new HashSet<String>();
+		final Pattern matchPattern;
+		try {
+			String matcherRegEx = matchStr;
+			matcherRegEx = matcherRegEx.replaceAll("\\.", "\\.");
+			matcherRegEx = matcherRegEx.replaceAll("\\*", ".*");
+			matcherRegEx = matcherRegEx.replaceAll("\\?", ".");
+			matchPattern = Pattern.compile(matcherRegEx, Pattern.CASE_INSENSITIVE);
+		} catch (PatternSyntaxException ex) {
+			throw new IllegalArgumentException(ex);
+		}
+		File[] grandparents = filesDir.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				if ( pathname.isDirectory() )
+					return true;
+				return false;
+			}
+		});
+		for ( File partitionDir : grandparents ) {
+    		File[] datasetFiles = partitionDir.listFiles(new FileFilter() {
+    			@Override
+    			public boolean accept(File file) {
+    					return file.getName().endsWith(".properties");
+    				}
+			});
+			for ( File match : datasetFiles ) {
+				String filename = match.getName();
+				String datasetId = filename.substring(0, filename.lastIndexOf('.'));
+				DashboardDataset dd = getDatasetFromInfoFile(datasetId);
+				String datasetOwner = dd.getOwner();
+				String uploadFilename = dd.getUploadFilename();
+				if ( matchPattern.matcher(datasetOwner).matches() ||
+					 matchPattern.matcher(uploadFilename).matches()) {
+					matchingIds.add(datasetId);
+				}
+			}
+        }
+		
+		return matchingIds;
+	}
 
     /**
      * Determines if a dataset data file exists
@@ -502,6 +546,17 @@ public class DataFileHandler extends VersionedFileHandler {
         return dataset;
     }
 
+    /**
+     * Convenience method to get all the data.
+     * 
+     * @param datasetId
+     * @return
+     * @throws IllegalArgumentException
+     */
+    public DashboardDatasetData getDatasetDataFromFiles(String datasetId) throws IllegalArgumentException {
+    	return getDatasetDataFromFiles(datasetId, 0, -1);
+    }
+    
     /**
      * Get a dataset with data saved to file
      *

@@ -292,7 +292,7 @@ public class UserFileHandler extends VersionedFileHandler {
      * are owned by the user, or owned by someone the user manages, are added.
      *
      * @param wildDatasetId
-     *         dataset ID, possibly with wildcards * and ?, to add
+     *         dataset ID, or username of dataset owner, possibly with wildcards * and ?, to add
      * @param username
      *         user whose dataset list is to be updated
      *
@@ -308,6 +308,7 @@ public class UserFileHandler extends VersionedFileHandler {
         String cleanUsername = DashboardServerUtils.cleanUsername(username);
         if ( cleanUsername.isEmpty() )
             throw new IllegalArgumentException("invalid username");
+
         DashboardConfigStore configStore;
         try {
             configStore = DashboardConfigStore.get(false);
@@ -316,8 +317,15 @@ public class UserFileHandler extends VersionedFileHandler {
         }
         DataFileHandler dataHandler = configStore.getDataFileHandler();
         HashSet<String> matchingIds = dataHandler.getMatchingDatasetIds(wildDatasetId);
-        if ( matchingIds.size() == 0 )
-            throw new IllegalArgumentException("No datasets with an ID matching " + wildDatasetId);
+		if ( matchingIds.isEmpty() ) {
+			if ( configStore.isAdmin(cleanUsername)) {
+				matchingIds = dataHandler.getDatasetsThatMatch(wildDatasetId);
+			}
+			if ( matchingIds.isEmpty()) {
+				throw new IllegalArgumentException("No datasets found that match filter " + wildDatasetId);
+			}
+		}
+
         DashboardDatasetList datasetList = getDatasetListing(cleanUsername);
         String commitMsg = "Added dataset(s) ";
         boolean needsCommit = false;
