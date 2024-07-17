@@ -4,6 +4,7 @@ import gov.loc.repository.bagit.creator.BagCreator;
 import gov.loc.repository.bagit.domain.Bag;
 import gov.loc.repository.bagit.hash.StandardSupportedAlgorithms;
 import gov.loc.repository.bagit.verify.BagVerifier;
+import gov.noaa.pmel.dashboard.actions.FileXferService;
 import gov.noaa.pmel.dashboard.metadata.OmeUtils;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -31,6 +32,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -42,6 +44,8 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -68,11 +72,13 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     private static final String EMAIL_MSG_MIDDLE = " to SOCAT for QC, \n" +
             "the SOCAT Upload Dashboard user ";
     private static final String EMAIL_MSG_END = " \n" +
-            "has requested immediate archival of the attached BagIt ZIP file of data and metadata. \n" +
+            "has requested immediate archival of the dataset data and metadata. \n" +
             "\n" +
-            "The metadata file " + OCADS_XML_FILENAME + " is an *experimental* OCADS metadata file generated \n" +
-            "from any OME metadata or metadata provided in the data file.  This file was machine-generated \n" +
-            "and added only to assist in the archival, but should *not* be archived. \n" +
+            "The dataset BagIt package has been posted to NCEI for pickup and archival.\n" +
+//            "\n" +
+//            "The metadata file " + OCADS_XML_FILENAME + " is an *experimental* OCADS metadata file generated \n" +
+//            "from any OME metadata or metadata provided in the data file.  This file was machine-generated \n" +
+//            "and added only to assist in the archival, but should *not* be archived. \n" +
             "\n" +
             "Best regards, \n" +
             "SOCAT Team \n";
@@ -200,6 +206,256 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         if unable to commit the bundle to version control
      */
     public String sendOrigFilesBundle(String datasetId, String message, String userRealName,
+            String userEmail) throws IllegalArgumentException, IOException {
+        if ( (toEmails == null) || (toEmails.length == 0) )
+            throw new IllegalArgumentException("no archival email address");
+        if ( (ccEmails == null) || (ccEmails.length == 0) )
+            throw new IllegalArgumentException("no cc email address");
+        if ( (userRealName == null) || userRealName.isEmpty() )
+            throw new IllegalArgumentException("no user name");
+        if ( (userEmail == null) || userEmail.isEmpty() )
+            throw new IllegalArgumentException("no user email address");
+        String stdId = DashboardServerUtils.checkDatasetID(datasetId);
+        DashboardConfigStore configStore = DashboardConfigStore.get(false);
+
+        // The SDIMetadata object created from any metadata provided - for auto-generating OCADS XML file
+        SocatMetadata sdimdata = null;
+
+        DashboardDataset dsetInfo = configStore.getDataFileHandler().getDatasetFromInfoFile(datasetId);
+        ArrayList<DataColumnType> dataColTypes = dsetInfo.getDataColTypes();
+        ArrayList<String> dataColNames = dsetInfo.getUserColNames();
+        MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
+
+        // The platform name needed for the email message;
+        // mainly for moorings, which do not have a distinctive NODC code
+        String platformName = "";
+
+        // Check if there is a PI-provided OME document
+        try {
+            File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+            FileReader xmlReader = new FileReader(mdataFile);
+            sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
+            platformName = sdimdata.getPlatform().getPlatformName();
+        } catch ( Exception ex ) {
+            // Probably does not exist
+        }
+        if ( sdimdata == null ) {
+            // Use the OME stub (which should always exist)
+            try {
+                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
+                FileReader xmlReader = new FileReader(mdataFile);
+                sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
+                platformName = sdimdata.getPlatform().getPlatformName();
+            } catch ( Exception ex ) {
+                throw new RuntimeException(
+                        "Unexpected failure to read " + DashboardUtils.OME_FILENAME + " for " + stdId);
+            }
+        }
+        else if ( platformName.isEmpty() ) {
+            // PI-provided OME document given, but does not contain the platform name; try to get it
+            // from the OME stub (ie, check if it was given in the metadata preamble of the data file)
+            try {
+                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
+                FileReader xmlReader = new FileReader(mdataFile);
+                SocatMetadata stub = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
+                platformName = stub.getPlatform().getPlatformName();
+            } catch ( Exception ex ) {
+                throw new RuntimeException(
+                        "Unexpected failure to read " + DashboardUtils.OME_FILENAME + " for " + stdId);
+            }
+            if ( !platformName.isEmpty() ) {
+                // Add the platform name to the SDIMetadata object
+                Platform platform = sdimdata.getPlatform();
+                platform.setPlatformName(platformName);
+                sdimdata.setPlatform(platform);
+            }
+        }
+
+        // Make sure there is a history entry if this is an update to an archived dataset
+        MiscInfo miscInfo = sdimdata.getMiscInfo();
+        ArrayList<Datestamp> archiveDates = miscInfo.getHistory();
+        if ( archiveDates.isEmpty() ) {
+            // Check for any archive timestamps in the dataset info
+            for (String datetime : dsetInfo.getArchiveTimestamps()) {
+                // The format of these timestamps are "yyyy-MM-dd HH:mm Z"
+                String[] pieces = datetime.split("[ :/-]");
+                Datestamp datestamp = new Datestamp(pieces[0], pieces[1], pieces[2]);
+                archiveDates.add(datestamp);
+            }
+            if ( archiveDates.isEmpty() ) {
+                // Check if the dataset was archived but no archive date recorded
+                String archiveStatus = dsetInfo.getArchiveStatus();
+                if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) ||
+                        archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) ||
+                        archiveStatus.startsWith(DashboardUtils.ARCHIVE_STATUS_SENT_TO_START) )
+                    // Add a datestamp of 1900-01-01 to indicate unknown submission date
+                    archiveDates.add(new Datestamp("1900", "1", "1"));
+            }
+            if ( !archiveDates.isEmpty() ) {
+                // MiscInfo.getHistory returns a copy, so need to update it in the MiscInfo object
+                miscInfo.setHistory(archiveDates);
+                // SDIMetadata.getMiscInfo returns a copy, so need to update it in the SDIMetadata object
+                sdimdata.setMiscInfo(miscInfo);
+            }
+        }
+
+        String fullId;
+        String emailBundleName;
+        if ( !platformName.isEmpty() ) {
+            fullId = stdId + " (" + platformName + ")";
+            emailBundleName = stdId + "_" + nameCleaner.matcher(platformName).replaceAll("") + "_bagit.zip";
+        }
+        else {
+            fullId = stdId;
+            emailBundleName = stdId + "_bagit.zip";
+        }
+
+        // Generate the bundle as a zip file
+        File bundleFile = getOrigZipBundleFile(stdId);
+        String infoMsg = createBagitFilesBundle(stdId, sdimdata);
+
+        // Commit the bundle to version control
+        if ( (message != null) && !message.isEmpty() ) {
+            try {
+                commitVersion(bundleFile, message);
+            } catch ( Exception ex ) {
+                throw new IOException("Problems committing the archival file bundle for " +
+                        stdId + ": " + ex.getMessage());
+            }
+        }
+        try {
+			File hashFile = hashit(bundleFile);
+			if ( hashFile != null ) {
+				commitVersion(hashFile, "Hash file for archive bundle for " + stdId);
+			}
+        } catch (NoSuchAlgorithmException nsax) {
+        	System.out.println("WARNING: Exception creating hash file for " + bundleFile.getPath() + " : " + nsax);
+        } catch ( Exception ex ) {
+            System.out.println("Problems committing the hash file for bundle for " +
+                    stdId + ": " + ex.getMessage());
+        }
+
+        // If userRealName is "nobody" and userEmail is "nobody@nowhere" then skip the email
+        if ( DashboardServerUtils.NOMAIL_USER_REAL_NAME.equals(userRealName) &&
+                DashboardServerUtils.NOMAIL_USER_EMAIL.equals(userEmail) ) {
+            return "Data files archival bundle created but not emailed";
+        }
+
+        // Create a Session for sending out the email
+        Properties props = System.getProperties();
+        if ( debugIt )
+            props.setProperty("mail.debug", "true");
+        props.setProperty("mail.transport.protocol", "smtp");
+        if ( (smtpHost != null) && !smtpHost.isEmpty() )
+            props.put("mail.smtp.host", smtpHost);
+        else
+            props.put("mail.smtp.host", "localhost");
+        if ( (smtpPort != null) && !smtpPort.isEmpty() )
+            props.put("mail.smtp.port", smtpPort);
+        Session sessn;
+        if ( auth != null ) {
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.ssl.enable", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.starttls.required", "true");
+            sessn = Session.getInstance(props, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return auth;
+                }
+            });
+        }
+        else {
+            sessn = Session.getInstance(props, null);
+        }
+
+        // Parse all the email addresses, add the user's email as the first cc'd address
+        InternetAddress[] ccAddresses = new InternetAddress[ccEmails.length + 1];
+        try {
+            ccAddresses[0] = new InternetAddress(userEmail);
+        } catch ( MessagingException ex ) {
+            String errmsg = getMessageExceptionMsgs(ex);
+            throw new IllegalArgumentException("Invalid user email address: " + errmsg, ex);
+        }
+        for (int k = 0; k < ccEmails.length; k++) {
+            try {
+                ccAddresses[k + 1] = new InternetAddress(ccEmails[k]);
+            } catch ( MessagingException ex ) {
+                String errmsg = getMessageExceptionMsgs(ex);
+                throw new IllegalArgumentException("Invalid 'CC:' email address: " + errmsg, ex);
+            }
+        }
+        InternetAddress[] toAddresses = new InternetAddress[toEmails.length];
+        for (int k = 0; k < toEmails.length; k++) {
+            try {
+                toAddresses[k] = new InternetAddress(toEmails[k]);
+            } catch ( MessagingException ex ) {
+                String errmsg = getMessageExceptionMsgs(ex);
+                throw new IllegalArgumentException("Invalid 'To:' email address: " + errmsg, ex);
+            }
+        }
+        
+        try {
+			FileXferService.putArchiveBundle(datasetId, bundleFile);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        // Create the email message with the renamed zip attachment
+        MimeMessage msg = new MimeMessage(sessn);
+        try {
+            msg.setHeader("X-Mailer", "ArchiveFilesBundler");
+            msg.setSubject(EMAIL_SUBJECT_MSG_START + fullId + EMAIL_SUBJECT_MSG_MIDDLE + userRealName);
+            msg.setSentDate(new Date());
+            // Set the addresses
+            // Mark as sent from the second cc'd address (the dashboard's);
+            // the first cc address is the user and any others are purely supplemental
+            msg.setFrom("oar.pmel.socat.support@noaa.gov"); // ccAddresses[1]);
+            msg.setReplyTo(ccAddresses);
+            msg.setRecipients(Message.RecipientType.TO, toAddresses);
+            msg.setRecipients(Message.RecipientType.CC, ccAddresses);
+            // Create the text message part
+            msg.setText(EMAIL_MSG_START + fullId + EMAIL_MSG_MIDDLE + userRealName + EMAIL_MSG_END, "utf8");
+//            MimeBodyPart textMsgPart = new MimeBodyPart();
+//            textMsgPart.setText(EMAIL_MSG_START + fullId + EMAIL_MSG_MIDDLE + userRealName + EMAIL_MSG_END);
+//            // Create the attachment message part
+//            MimeBodyPart attMsgPart = new MimeBodyPart();
+//            attMsgPart.attachFile(bundleFile);
+//            attMsgPart.setFileName(emailBundleName);
+//            // Create and add the multipart document to the message
+//            Multipart mp = new MimeMultipart();
+//            mp.addBodyPart(textMsgPart);
+//            mp.addBodyPart(attMsgPart);
+//            msg.setContent(mp);
+            // Update the headers
+            msg.saveChanges();
+        } catch ( MessagingException ex ) {
+            String errmsg = getMessageExceptionMsgs(ex);
+            throw new IllegalArgumentException("Problems creating the archival request email: " + errmsg, ex);
+        }
+
+        // Send the email
+        try {
+            Transport.send(msg);
+        } catch ( MessagingException ex ) {
+            String errmsg = getMessageExceptionMsgs(ex);
+            throw new IllegalArgumentException("Problems sending the archival request email: " + errmsg, ex);
+        }
+
+        infoMsg += "Files bundle sent To: " + toEmails[0];
+        for (int k = 1; k < toEmails.length; k++) {
+            infoMsg += ", " + toEmails[k];
+        }
+        infoMsg += "; CC: " + userEmail + ", " + ccEmails[0];
+        for (int k = 1; k < ccEmails.length; k++) {
+            infoMsg += ", " + ccEmails[k];
+        }
+        infoMsg += "\n";
+        return infoMsg;
+    }
+
+    public String _sendOrigFilesBundle(String datasetId, String message, String userRealName,
             String userEmail) throws IllegalArgumentException, IOException {
         if ( (toEmails == null) || (toEmails.length == 0) )
             throw new IllegalArgumentException("no archival email address");
@@ -512,6 +768,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
                 dest = new File(bundleDir, metaFile.getName());
                 Files.copy(metaFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
             }
+            // lonlat moved to onSubmit handling
+            
             // The SDIMetadata object is always present, but may just be a minimal stub with history
             infoMsg += "    " + OCADS_XML_FILENAME + "\n";
             dest = new File(bundleDir, OCADS_XML_FILENAME);
@@ -521,9 +779,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         }
 
         // Create the bagit directory tree in-place (restructures and adds files) from the bagit bundles directory
-        try {
+        try ( BagVerifier verifier = new BagVerifier(); ) {
             Bag bag = BagCreator.bagInPlace(bundleDir.toPath(), Arrays.asList(StandardSupportedAlgorithms.MD5), false);
-            BagVerifier verifier = new BagVerifier();
             verifier.isComplete(bag, true);
             verifier.isValid(bag, true);
         } catch ( Exception ex ) {
@@ -569,7 +826,48 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         return infoMsg;
     }
 
-    /**
+    private File hashit(File archiveFile) throws NoSuchAlgorithmException, IOException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        
+        //Get file input stream for reading the file content
+        try ( FileInputStream fis = new FileInputStream(archiveFile); ) {
+            //Create byte array to read data in chunks
+            byte[] byteArray = new byte[1024];
+            int bytesCount = 0;
+              
+            //Read file data and update in message digest
+            while ((bytesCount = fis.read(byteArray)) != -1) {
+                digest.update(byteArray, 0, bytesCount);
+            }
+        }
+         
+        //Get the hash's bytes
+        byte[] bytes = digest.digest();
+         
+        //This bytes[] has bytes in decimal format;
+        //Convert it to hexadecimal format
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i< bytes.length ;i++) {
+            sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+        }
+         
+       String hash = sb.toString();
+       
+       String hashFileName = archiveFile.getName().substring(0, archiveFile.getName().indexOf('.')) + "-sha256.txt";
+       File digestFile = new File(archiveFile.getParentFile(), hashFileName);
+       try (FileWriter hashWriter = new FileWriter(digestFile)) {
+           hashWriter.write(hash);
+       }
+//       try { // simpler way using Bagit class
+//           String hashy = Hasher.hash(archiveFile.toPath(), digest);
+//           System.out.println("hashy: " + hash.compareTo(hashy));
+//       } catch (Exception ex) {
+//           ex.printStackTrace();
+//       }
+       return digestFile;
+    }
+
+	/**
      * Returns all messages in a possibly-nested MessagingException.  The messages are returned
      * as a single String by joining all the Exception messages together using a comma and space.
      *

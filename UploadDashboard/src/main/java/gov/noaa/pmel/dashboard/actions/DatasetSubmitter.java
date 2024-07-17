@@ -27,6 +27,7 @@ import gov.noaa.pmel.dashboard.shared.DataQCFlag;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -176,6 +177,13 @@ public class DatasetSubmitter {
                                 "(missing lon/lat/time or uninterpretable values)");
                         continue;
                     }
+                    try {
+						// create lonlat.txt file if necessary
+						File dest = metadataHandler.getMetadataFile(datasetId, "lonlat.txt");
+						metadataHandler.saveLocationsFile(dataset, userStdData, dest);
+		            } catch (Exception ex) {
+                    	itsLogger.warn(ex,ex);
+                    }
 
                     // Add the automated data checker data QC flags to the appropriate data QC columns
                     userStdData.addAutomatedDataQC();
@@ -188,7 +196,15 @@ public class DatasetSubmitter {
                     // Generate the decimated-data DSG file from the full-data DSG file
                     if ( itsLogger != null )
                         itsLogger.debug("Generating the decimated-data DSG file for " + datasetId);
-                    dsgHandler.decimateDatasetDsg(datasetId);
+//                    try {
+	                    dsgHandler.decimateDatasetDsg(datasetId);
+//					} catch (Exception e) {
+//						if ( ignoreErrors ) {
+//							itsLogger.warn(e);
+//						} else {
+//							throw e;
+//						}
+//					}
 
                     // Update the all_region_ids metadata variable from the Ferret-generated
                     // region_id data variable in the full-data DSG file.

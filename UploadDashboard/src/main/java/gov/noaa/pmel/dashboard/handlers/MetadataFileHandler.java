@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
+import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.metadata.OadsOmeMetadata;
@@ -12,6 +13,7 @@ import gov.noaa.pmel.dashboard.qc.DataQCEvent;
 import gov.noaa.pmel.dashboard.qc.RowNumSet;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.apache.tomcat.util.http.fileupload.FileItem;
@@ -975,5 +977,48 @@ public class MetadataFileHandler extends VersionedFileHandler {
     public void deleteWoceFlagMsgsFile(String username, String datasetId) throws IllegalArgumentException {
         deleteMetadata(username, datasetId, FLAG_MSGS_FILENAME);
     }
+
+    /**
+     * @param stdArray
+     * @throws IOException 
+     */
+    public void saveLocationsFile(DashboardDatasetData ddd, StdUserDataArray stdArray, File destination) throws IOException {
+        File lonLatFile = destination;
+        boolean isUpdate = lonLatFile.exists();
+        try ( PrintWriter lonLatFileWriter = new PrintWriter(new FileWriter(lonLatFile))) {
+            Double[] lats = stdArray.getSampleLatitudes();
+            Double[] lons = stdArray.getSampleLongitudes();
+            for (int idx = 1; idx < stdArray.getNumSamples(); idx++) {
+                lonLatFileWriter.println(lons[idx] + " " + lats[idx]);
+            }
+        }
+        writePropertiesFile(ddd, destination, isUpdate);
+    }
+
+	private void writePropertiesFile(DashboardDatasetData ddd, File destination, boolean isUpdate) {
+		String uploadTimestamp = new SimpleDateFormat("YYYY-MM-dd HH:mm z").format(new Date());
+		String datasetId = ddd.getDatasetId();
+		String owner = ddd.getOwner();
+		String metadataFileName = destination.getName();
+	    DashboardMetadata metadata = new DashboardMetadata();
+	    metadata.setDatasetId(ddd.getDatasetId());
+	    metadata.setFilename(metadataFileName);
+	    metadata.setUploadTimestamp(uploadTimestamp);
+	    metadata.setOwner(owner);
+	    metadata.setVersion(ddd.getVersion());
+	
+	    String message;
+	    // Save the metadata properties
+	    if ( isUpdate ) {
+	        message = "Updated properties of metadata document " + metadataFileName +
+	                " for dataset " + datasetId + " and owner " + owner;
+	    }
+	    else {
+	        message = "Added properties of metadata document " + metadataFileName +
+	                " for dataset " + datasetId + " and owner " + owner;
+	    }
+	    saveMetadataInfo(metadata, message, true);
+	}
+
 
 }
