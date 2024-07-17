@@ -101,8 +101,10 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         HttpServletRequest request = getThreadLocalRequest();
         try {
             username = DashboardServerUtils.cleanUsername(request.getUserPrincipal().getName().trim());
+            System.out.println("Validate " + username);
         } catch ( Exception ex ) {
             // Probably null pointer exception
+        	System.out.println(ex);
             return false;
         }
         if ( (pageUsername != null) && !pageUsername.equals(username) )
@@ -119,6 +121,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
         if ( !configStore.validateUser(username) ) {
             // If validation failed, logout to clear the stored username and require a new login
+        	System.out.println("Invalid user: " + username);
             logoutUser();
             return false;
         }
@@ -128,9 +131,17 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     @Override
     public DashboardDatasetList getDatasetList() throws IllegalArgumentException {
         // Get the dashboard data store and current username
-        if ( !validateRequest(null) )
+    	System.out.println("get dataset list");
+        if ( !validateRequest(null) ) {
             throw new IllegalArgumentException("Invalid user request");
-        DashboardDatasetList datasetList = configStore.getUserFileHandler().getDatasetListing(username);
+        }
+        DashboardDatasetList datasetList = null;
+        try {
+	        datasetList = configStore.getUserFileHandler().getDatasetListing(username);
+        } catch (Exception ex) {
+        	System.out.println("Get datasetList: "+ ex);
+        	datasetList = new DashboardDatasetList();
+        }
         itsLogger.info("dataset list returned for " + username);
         return datasetList;
     }

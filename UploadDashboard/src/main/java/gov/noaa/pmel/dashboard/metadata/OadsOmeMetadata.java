@@ -24,6 +24,7 @@ import gov.noaa.ncei.oads.xml.v_a0_2_2s.TypedStringType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus.Status;
 import gov.noaa.pmel.oads.util.StringUtils;
 import gov.noaa.pmel.oads.xml.a0_2_2.OadsXmlReader;
 import gov.noaa.pmel.oads.xml.a0_2_2.OadsXmlWriter;
@@ -412,6 +413,10 @@ public class OadsOmeMetadata implements OmeMetadataInterface {
 //        System.out.println("Wrote XML to " + xmlFile.getAbsolutePath());
         DatasetQCStatus status = OmeUtils.suggestDatasetQCFlag(socat, dataset);
         System.out.println(dataset.getDatasetId() + " : OADS status: " + status);
+        if ( ! Status.isAcceptable(status.getAutoSuggested())) {
+        	System.out.println("AutoQC status not acceptable: "+ status.getAutoSuggested() + "."
+        						+ " Using status " + Status.NEW_AWAITING_QC);
+        }
         return status;
     }
 

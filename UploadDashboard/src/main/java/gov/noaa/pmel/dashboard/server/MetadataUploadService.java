@@ -152,7 +152,7 @@ public class MetadataUploadService extends HttpServlet {
         }
 
         boolean isOme = omeIndicator.equals("true");
-        boolean isOmeXml = xmlIndicator.equals("OME");
+        boolean isOmeXml = "OME".equals(xmlIndicator);
         String version = configStore.getUploadVersion();
 
         MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();

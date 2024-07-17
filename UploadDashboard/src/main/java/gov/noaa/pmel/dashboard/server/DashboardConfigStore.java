@@ -22,6 +22,9 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
 import gov.noaa.pmel.dashboard.handlers.SpellingHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
+import gov.noaa.pmel.tws.util.ApplicationConfiguration;
+import gov.noaa.pmel.tws.util.ApplicationConfiguration.ConfigurationException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
@@ -201,6 +204,13 @@ public class DashboardConfigStore {
         if ( !appConfigDir.exists() || !appConfigDir.isDirectory() || !appConfigDir.canRead() ) {
             throw new IllegalStateException("Problem with app config dir: " + appConfigDir.getAbsoluteFile());
         }
+        try {
+			ApplicationConfiguration.Initialize(appConfigDir, "oap");
+		} catch (ConfigurationException e) {
+            throw new IllegalStateException("Failed to initialize ApplicationConfiguration from: " 
+            								+ appConfigDir.getAbsoluteFile() + ": " + e, e);
+		}
+        
         String previewDirname = baseDir + "webapps" + File.separator + serverAppName + File.separator +
                 "preview" + File.separator;
 
@@ -532,6 +542,7 @@ public class DashboardConfigStore {
             if ( itsLogger != null )
                 itsLogger.info("read Database configuration file " + propVal);
         } catch ( Exception ex ) {
+        	ex.printStackTrace();
             throw new IOException("Invalid " + DATABASE_CONFIG_FILE_NAME_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
