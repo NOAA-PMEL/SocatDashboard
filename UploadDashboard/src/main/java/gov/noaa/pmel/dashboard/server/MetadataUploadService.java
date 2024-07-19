@@ -12,12 +12,14 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+import gov.noaa.pmel.oads.util.StringUtils;
+
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -34,10 +36,12 @@ import java.util.TreeSet;
  *
  * @author Karl Smith
  */
-public class MetadataUploadService extends HttpServlet {
+public class MetadataUploadService extends CommonServiceBase {
 
     private static final long serialVersionUID = 3482482593306147686L;
 
+    private static final Logger logger = LogManager.getLogger(MetadataUploadService.class);
+    		
     private ServletFileUpload metadataUpload;
 
     public MetadataUploadService() {
@@ -68,6 +72,8 @@ public class MetadataUploadService extends HttpServlet {
             return;
         }
 
+        List<String> errorMsgs = new ArrayList<String>();
+        
         // Get the contents from the post request
         String username = null;
         try {
@@ -185,10 +191,60 @@ public class MetadataUploadService extends HttpServlet {
         DashboardMetadata metadata = null;
         for (String id : idSet) {
             try {
+            	File tmpFile = File.createTempFile("socat_metadata_"+uploadFilename.replaceAll(" ", "."), ".tmp");
+            	metadataItem.write(tmpFile);
+	            VScanner scanner = new VScanner();
+	            String quarantine = getQuarantineLocation(username);
+	            try {
+		            boolean hasVirus = scanner.scanFile(tmpFile, quarantine);
+		            if ( hasVirus ) {
+		            	String alertMsg = new StringBuilder()
+		            						.append("*** ALERT *** Virus detected in uploaded file ")
+		            						.append(uploadFilename)
+		            						.append(" : ")
+		            						.append(scanner.getVirus())
+		            						.toString();
+		            						
+		            	logger.warn("Exception scanning uploaded data file: " + uploadFilename  // XXX TODO: abort w/ error?
+		            				+ " @ " + tmpFile.getPath() + " : " + alertMsg);
+		                // Mark as a failed file, and go on to the next
+		            	errorMsgs.add(DashboardUtils.INVALID_FILE_HEADER_TAG + " " + uploadFilename);
+		                errorMsgs.add(alertMsg);
+		                errorMsgs.add("\n");
+		                errorMsgs.add(VIRUS_DETECTED);
+		                errorMsgs.add(DashboardUtils.END_OF_ERROR_MESSAGE_TAG);
+		                try {
+			                metadataItem.delete();
+		                } catch (Exception ex2) {
+		                	if ( !StringUtils.emptyOrNull(quarantine)) {
+		                		logger.warn("Failed to delete uploaded file item: " + ex2);
+		                	}
+		                	
+		                }
+		                metadataItem.delete();
+		                break;
+	//	            	throw iax;
+		            }
+	            } catch (Exception ex) {
+	            	logger.warn("Exception scanning uploaded data file: " + uploadFilename  // XXX TODO: abort w/ error?
+	            				+ " @ " + tmpFile.getPath() + " : " + ex);
+	                // Mark as a failed file, and go on to the next
+	                errorMsgs.add(ex.getMessage());
+	                try {
+		                metadataItem.delete();
+	                } catch (Exception ex2) {
+	                	if ( !StringUtils.emptyOrNull(quarantine)) {
+	                		logger.warn("Failed to delete uploaded file item: " + ex2);
+	                	}
+	                	
+	                }
+	                break;
+	            }
+
                 // Save the metadata document for this cruise
                 if ( metadata == null ) {
                     metadata = metadataHandler.saveMetadataFileItem(id, username, uploadTimestamp,
-                            uploadFilename, version, metadataItem);
+                            uploadFilename, version, tmpFile);
                 }
                 else {
                     metadata = metadataHandler.copyMetadataFile(id, metadata, true);
@@ -266,6 +322,8 @@ public class MetadataUploadService extends HttpServlet {
                     }
                 }
 
+            } catch (IllegalArgumentException iax) {
+            	logger.warn(iax);
             } catch ( Exception ex ) {
                 metadataItem.delete();
                 sendErrMsg(response, ex.getMessage());
@@ -273,12 +331,20 @@ public class MetadataUploadService extends HttpServlet {
             }
         }
 
-        // Send the success response
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter respWriter = response.getWriter();
-        respWriter.println(DashboardUtils.SUCCESS_HEADER_TAG);
-        response.flushBuffer();
+		try ( PrintWriter respWriter = response.getWriter(); ) {
+			if ( ! errorMsgs.isEmpty()) {
+//				respWriter.println(DashboardUtils.INVALID_FILE_HEADER_TAG);
+				for ( String msg : errorMsgs) {
+					respWriter.println(msg);
+				}
+//                errorMsgs.add(DashboardUtils.END_OF_ERROR_MESSAGE_TAG);
+			} else {
+    			respWriter.println(DashboardUtils.SUCCESS_HEADER_TAG);
+			}
+			response.flushBuffer();
+		}
     }
 
     /**

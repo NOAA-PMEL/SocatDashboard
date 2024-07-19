@@ -16,7 +16,8 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import org.apache.tomcat.util.http.fileupload.FileItem;
+import gov.noaa.pmel.tws.util.FileUtils;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -202,7 +203,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         new metadata document, or if problems committing the new metadata document to version control
      */
     public DashboardMetadata saveMetadataFileItem(String datasetId, String owner, String uploadTimestamp,
-            String uploadFilename, String version, FileItem uploadFileItem) throws IllegalArgumentException {
+            String uploadFilename, String version, File uploadFile) throws IllegalArgumentException {
         // Create the metadata filename
         File metadataFile = getMetadataFile(datasetId, uploadFilename);
 
@@ -226,7 +227,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
         // Copy the uploaded data to the metadata document
         try {
-            uploadFileItem.write(metadataFile);
+            FileUtils.copyFile(uploadFile, metadataFile);
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems creating/updating the metadata document " +
                     metadataFile.getPath() + ":\n    " + ex.getMessage());

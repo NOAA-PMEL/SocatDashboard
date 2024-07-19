@@ -317,12 +317,23 @@ public class OmeManagerPage extends CompositeWithUsername {
             return;
         }
         resultMsg = resultMsg.trim();
+        String[] splitMsgs = resultMsg.trim().split("\n");
         if ( resultMsg.startsWith(DashboardUtils.SUCCESS_HEADER_TAG) ) {
             // cruise file created or updated; return to the cruise list,
             // having it request the updated cruises for the user from the server
             DatasetListPage.showPage();
-        }
-        else {
+	    } else if ( resultMsg.startsWith(DashboardUtils.INVALID_FILE_HEADER_TAG) ) {
+	        // An exception was thrown while processing the input file
+			String header = splitMsgs[0];
+	        String filename = header.substring(DashboardUtils.INVALID_FILE_HEADER_TAG.length()).trim();
+	        String failMsg = "<h3>" + SafeHtmlUtils.htmlEscape(filename) + EXPLAINED_FAIL_MSG_START;
+	        for (int k = 1; k < splitMsgs.length; k++) {
+	            if ( splitMsgs[k].trim().startsWith(DashboardUtils.END_OF_ERROR_MESSAGE_TAG) )
+	                break;
+	            failMsg += SafeHtmlUtils.htmlEscape(splitMsgs[k]) + "\n";
+	        }
+	        UploadDashboard.showMessage(failMsg);
+		} else {
             // Unknown response, just display the entire message
             UploadDashboard.showMessage(EXPLAINED_FAIL_MSG_START +
                     SafeHtmlUtils.htmlEscape(resultMsg) + EXPLAINED_FAIL_MSG_END);

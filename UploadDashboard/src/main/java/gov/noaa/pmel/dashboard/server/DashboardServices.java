@@ -21,6 +21,8 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
+
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +41,8 @@ import java.util.TreeSet;
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
     private static final long serialVersionUID = -1849939750979152323L;
+    
+    private static final Logger logger = LogManager.getLogger(DashboardServices.class);
 
     private String username = null;
     private DashboardConfigStore configStore = null;
@@ -101,7 +105,6 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         HttpServletRequest request = getThreadLocalRequest();
         try {
             username = DashboardServerUtils.cleanUsername(request.getUserPrincipal().getName().trim());
-            System.out.println("Validate " + username);
         } catch ( Exception ex ) {
             // Probably null pointer exception
         	System.out.println(ex);
@@ -131,7 +134,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     @Override
     public DashboardDatasetList getDatasetList() throws IllegalArgumentException {
         // Get the dashboard data store and current username
-    	System.out.println("get dataset list");
+    	logger.debug("getDatasetList");
         if ( !validateRequest(null) ) {
             throw new IllegalArgumentException("Invalid user request");
         }

@@ -102,6 +102,8 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     private static final String UNEXPLAINED_FAIL_MSG =
             "<h3>Upload failed.</h3>" +
                     "<p>Unexpectedly, no explanation of the failure was given</p>";
+    private static final String FAIL_MSG_START =
+    		"<h3>";
     private static final String EXPLAINED_FAIL_MSG_START =
             "<h3>Upload failed.</h3>" +
                     "<p><pre>\n";
@@ -400,10 +402,22 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
             return;
         }
         resultMsg = resultMsg.trim();
+        String[] splitMsgs = resultMsg.trim().split("\n");
         if ( resultMsg.startsWith(DashboardUtils.SUCCESS_HEADER_TAG) ) {
             // Do not show any messages on success;
             // depend on the updated list of documents to show success
             ;
+        } else if ( resultMsg.startsWith(DashboardUtils.INVALID_FILE_HEADER_TAG) ) {
+                // An exception was thrown while processing the input file
+        		String header = splitMsgs[0];
+                String filename = header.substring(DashboardUtils.INVALID_FILE_HEADER_TAG.length()).trim();
+                String failMsg = FAIL_MSG_START + SafeHtmlUtils.htmlEscape(filename) + EXPLAINED_FAIL_MSG_START;
+                for (int k = 1; k < splitMsgs.length; k++) {
+                    if ( splitMsgs[k].trim().startsWith(DashboardUtils.END_OF_ERROR_MESSAGE_TAG) )
+                        break;
+                    failMsg += SafeHtmlUtils.htmlEscape(splitMsgs[k]) + "\n";
+                }
+                UploadDashboard.showMessage(failMsg);
         }
         else {
             // Unknown response, just display the entire message
