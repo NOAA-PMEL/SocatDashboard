@@ -76,10 +76,15 @@ public class FileXferService {
      */
     public static String putArchiveBundle(String datasetId, File archiveBundle) throws Exception {
 //                                       , String userRealName, String userEmail) throws Exception {
+    	return putArchiveBundle(datasetId, archiveBundle, null);
+    }
+    public static String putArchiveBundle(String datasetId, File archiveBundle,
+    									  String targetFileName) throws Exception {
         System.out.println("Submitting " + datasetId + " archive bundle " + archiveBundle + " to FTP site." );
         return new FileXferService().submitArchiveBundle(datasetId, 
 //                                                         String.valueOf(submitRec.version()), 
-                                                         archiveBundle); // , userRealName, userEmail);
+                                                         archiveBundle,
+                                                         targetFileName); // , userRealName, userEmail);
     }
 
     public FileXferService(XFER_PROTOCOL protocol) {
@@ -110,9 +115,10 @@ public class FileXferService {
 
     public String submitArchiveBundle(String stdId, 
 //    								  String version, 
-    								  File archiveBundle)  throws Exception {
+    								  File archiveBundle,
+    								  String targetFileName)  throws Exception {
         String targetDir = stdId + "/" ; //  + "/" + version + "/";
-        String targetFile = stdId + "_bagit.zip";
+        String targetFile = StringUtils.emptyOrNull(targetFileName)? stdId + "_bagit.zip" : targetFileName;
         String targetFilePath = targetDir + targetFile;
         String command = _transferOp.getTransferCommand(archiveBundle, targetFilePath);
         logger.debug("xfer cmd: " + command);
@@ -180,8 +186,9 @@ public class FileXferService {
         	} else {
         		throw new IllegalArgumentException("No expocode provided.");
         	}
+        	String platform = "GoodShipLollyPop";
 //                File archiveBundle = new File("/local/tomcat/oap_content/OAPUploadDashboard/MetadataDocs/NEMO/NEMOPRE052012/extracted_NEMOPRE052012_OADS.xml");
-            new FileXferService(XFER_PROTOCOL.SFTP).submitArchiveBundle(expocode, archiveBundle);
+            new FileXferService(XFER_PROTOCOL.SFTP).submitArchiveBundle(expocode, archiveBundle, expocode + "_" + platform + "_bagit.zip");
 //                new FileXferService(XFER_PROTOCOL.SCP).submitArchiveBundle("datasetID", archiveBundle, "Real Name", "real.name@noaa.gov");
 //                new FileXferService(XFER_PROTOCOL.CP).submitArchiveBundle("datasetID", archiveBundle, "Real Name", "real.name@noaa.gov");
         } catch (Exception ex) {
