@@ -5,3 +5,4 @@ target/
 .idea/workspace.xml
 UploadDashboard/GWTCompilerOutput_uploaddashboard/
 dev_content
+.DS_Store

@@ -30,11 +30,14 @@
     <path refid="library.javax.mail-1.6.1.classpath"/>
     <path refid="library.jdom-2.0.6.classpath"/>
     <path refid="library.joda-time-2.9.9.classpath"/>
-    <path refid="library.log4j-api-2.11.0.classpath"/>
-    <path refid="library.log4j-core-2.11.0.classpath"/>
-    <path refid="library.log4j-slf4j-impl-2.11.0.classpath"/>
-    <path refid="library.log4j-web-2.11.0.classpath"/>
-    <path refid="library.mysql-connector-java-5.1.46.classpath"/>
+    <path refid="library.log4j-api-2.17.1.classpath"/>
+    <path refid="library.log4j-core-2.17.1.classpath"/>
+    <path refid="library.log4j-slf4j-impl-2.17.1.classpath"/>
+    <path refid="library.log4j-web-2.17.1.classpath"/>
+    <path refid="library.mysql-connector-j-8.0.32.classpath"/>
+    <!-- path refid="library.mysql-connector-java-5.1.46.classpath"/-->
+    <path refid="library.oads_v_a0.2.2s.classpath"/>
+    <path refid="library.tws_util.classpath"/>
     <path refid="library.sequence-library-1.0.3.classpath"/>
     <path refid="library.serializer-2.7.2.classpath"/>
     <path refid="library.slf4j-api-1.7.25.classpath"/>
@@ -78,11 +81,14 @@
     <path refid="library.javax.mail-1.6.1.classpath"/>
     <path refid="library.jdom-2.0.6.classpath"/>
     <path refid="library.joda-time-2.9.9.classpath"/>
-    <path refid="library.log4j-api-2.11.0.classpath"/>
-    <path refid="library.log4j-core-2.11.0.classpath"/>
-    <path refid="library.log4j-slf4j-impl-2.11.0.classpath"/>
-    <path refid="library.log4j-web-2.11.0.classpath"/>
-    <path refid="library.mysql-connector-java-5.1.46.classpath"/>
+    <path refid="library.log4j-api-2.17.1.classpath"/>
+    <path refid="library.log4j-core-2.17.1.classpath"/>
+    <path refid="library.log4j-slf4j-impl-2.17.1.classpath"/>
+    <path refid="library.log4j-web-2.17.1.classpath"/>
+    <path refid="library.mysql-connector-j-8.0.32.classpath"/>
+    <!-- path refid="library.mysql-connector-java-5.1.46.classpath"/-->
+    <path refid="library.oads_v_a0.2.2s.classpath"/>
+    <path refid="library.tws_util.classpath"/>
     <path refid="library.sequence-library-1.0.3.classpath"/>
     <path refid="library.serializer-2.7.2.classpath"/>
     <path refid="library.slf4j-api-1.7.25.classpath"/>
@@ -120,11 +126,14 @@
     <path refid="library.javax.mail-1.6.1.classpath"/>
     <path refid="library.jdom-2.0.6.classpath"/>
     <path refid="library.joda-time-2.9.9.classpath"/>
-    <path refid="library.log4j-api-2.11.0.classpath"/>
-    <path refid="library.log4j-core-2.11.0.classpath"/>
-    <path refid="library.log4j-slf4j-impl-2.11.0.classpath"/>
-    <path refid="library.log4j-web-2.11.0.classpath"/>
-    <path refid="library.mysql-connector-java-5.1.46.classpath"/>
+    <path refid="library.log4j-api-2.17.1.classpath"/>
+    <path refid="library.log4j-core-2.17.1.classpath"/>
+    <path refid="library.log4j-slf4j-impl-2.17.1.classpath"/>
+    <path refid="library.log4j-web-2.17.1.classpath"/>
+    <path refid="library.mysql-connector-j-8.0.32.classpath"/>
+    <!-- path refid="library.mysql-connector-java-5.1.46.classpath"/-->
+    <path refid="library.oads_v_a0.2.2s.classpath"/>
+    <path refid="library.tws_util.classpath"/>
     <path refid="library.sequence-library-1.0.3.classpath"/>
     <path refid="library.serializer-2.7.2.classpath"/>
     <path refid="library.slf4j-api-1.7.25.classpath"/>
@@ -211,6 +220,7 @@
   
   <!-- Run GWT compiler for GWT module ${gwt.module.name} -->
   <target name="run.gwt.compiler.uploaddashboard" description="Run GWT compiler">
+    <property name="gwt.sdk.home.uploaddashboard" value="${gwt.sdk.home}"/>
     <java fork="true" classname="com.google.gwt.dev.Compiler" failonerror="true">
       <jvmarg line="-Xmx1024m"/>
       <classpath>

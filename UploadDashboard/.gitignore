@@ -1,3 +1,5 @@
 /bin/
 .classpath
 .project
+/test-classes/
+/rejar/
