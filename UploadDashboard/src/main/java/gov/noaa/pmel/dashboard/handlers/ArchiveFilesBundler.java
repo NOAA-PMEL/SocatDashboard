@@ -394,9 +394,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
                 throw new IllegalArgumentException("Invalid 'To:' email address: " + errmsg, ex);
             }
         }
-        
         try {
-			FileXferService.putArchiveBundle(datasetId, bundleFile);
+			FileXferService.putArchiveBundle(datasetId, bundleFile, emailBundleName);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

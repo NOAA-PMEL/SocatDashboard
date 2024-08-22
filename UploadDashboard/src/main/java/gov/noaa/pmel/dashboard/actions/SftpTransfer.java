@@ -52,8 +52,8 @@ public class SftpTransfer extends BaseTransferAgent implements FileTransferOp {
                 transferCmd.append("-mkdir ").append(curDir).append(" \n ");
             }
         }
-        transferCmd.append("put ").append(transferFile.getCanonicalPath()).append(SPACE).append(curDir+fileName).append(" \" | ")
-                   .append(command)
+        transferCmd.append("put ").append(transferFile.getCanonicalPath()).append(SPACE).append(curDir+fileName)
+        			.append(" \" | ").append(command)
                    .append(" -b - ");
         if ( ! StringUtils.emptyOrNull(idFile)) {
             transferCmd.append(getIdFileSpecifier())
