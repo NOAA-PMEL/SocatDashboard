@@ -631,7 +631,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                     qc.setDatasetId(datasetId);
                     dbHandler.addDatasetQCEvents(Collections.singletonList(qc));
                     //  update the dataset properties file
-                    String message = "dataset " + datasetId + " suspended by " + username;
+                    String message = "Dataset " + datasetId + " suspended by " + username;
                     dataHandler.saveDatasetInfoToFile(dset, message);
                     //  update the DSG files
                     String versionStatus = dbHandler.getVersionStatus(datasetId);

@@ -1420,7 +1420,7 @@ public class DataFileHandler extends VersionedFileHandler {
             return false;
         dset.setSubmitStatus(newStatus);
         saveDatasetInfoToFile(dset, "Update dataset dashboard status for " + expocode +
-                "from '" + oldStatus.statusString() + "' to '" + newStatus.statusString() + "'");
+                " from '" + oldStatus.statusString() + "' to '" + newStatus.statusString() + "'");
         return true;
     }
 

@@ -142,7 +142,7 @@ public class VersionedFileHandler {
                                 PrintWriter cmdsWriter = new PrintWriter(new FileWriter(
                                         new File(filesDir, SVN_COMMIT_COMMANDS_FILENAME), true));
                                 // Need to fix issues with single quotes in message
-                                cmdsWriter.print("svn commit --depth=empty -m '" + message + "'");
+                                cmdsWriter.print("svn commit --depth=empty -m \"" + message + "\"");
                                 for (File svnfile : commitFiles) {
                                     cmdsWriter.print(" " + svnfile.getPath());
                                 }
