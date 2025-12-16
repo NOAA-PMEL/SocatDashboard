@@ -1,4 +1,4 @@
-<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<!-- DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent" -->
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
@@ -20,7 +20,7 @@
                         <g:Button addStyleNames="{style.cruisepanelmainbutton}" ui:field="uploadButton"/>
                         <g:Label addStyleNames="{style.cruisebuttonpanelseparator}"/>
                         <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="viewDataButton"/>
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="omeMetadataButton"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="metadataButton"/>
                         <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="addlDocsButton"/>
                         <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="reviewButton"/>
                         <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="qcSubmitButton"/>
